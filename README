@@ -1,1 +1,1 @@
-Jump to the setup code, where the string "Wow I am in setup" is printed.
+Read the kernel code from disk and copy it in 0x1000:0. Jump to the setup code.

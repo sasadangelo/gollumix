@@ -1,7 +1,10 @@
+# SYSSIZE will be written during the build phase and it will be equal to the
+# size of the kernel image in 16 bytes click.
 SETUPSECTS  = 4
 BOOTSEG = 0x07C0
 INITSEG = 0x9000
 SETUPSEG= 0x9020
+SYSSEG   = 0x1000
 
 .code16
 .text
@@ -135,12 +138,255 @@ ok_load_setup:
     movw    $0x1301, %ax    # write string at row %dh and col %dl
                             # and move cursor
     int     $0x10
-	call kill_motor         # stop the floppy motor
+
+    movw    $SYSSEG, %ax
+    movw    %ax, %es
+    call read_it
+    call kill_motor         # stop the floppy motor
+
+# Basically in the memory there is the following situation:
+#
+#    ---------------
+#   |               |
+#   |_______________|
+#   |   BOOTSECTOR  | 0x07C0:0
+#   |               |
+#   |go: ....       |
+#   |               |
+#   |_______________|
+#   |               |
+#   |   .........   |
+#   |_______________|
+#   |               | 0x1000:0
+#   |     IMAGE     |
+#   |     KERNEL    |
+#   |    (main.c)   |
+#   |_______________|
+#   |   .........   |
+#   |_______________|
+#   |     COPY      |
+#   |   BOOTSECTOR  | 0x9000:0
+#   |               |
+#   |go: ....       |
+#   |               |
+#   |_______________|
+#   |    (head.S)   | 0x9000:0x200 = 0x90200
+#   |               |
+#   |     SETUP     | 4 sectors = 2048 bytes
+#   |               |
+#   |_______________|
+#   |               |
+#   |               |
+#   |     STACK     |
+#   |               |
+#   |_______________| <- 0x9000:0x4000-12
+#   |   DISK PARMS  |
+#   |   (12 bytes)  |
+#   |_______________| <- 0x9000:0x4000
+#
+# 0x4000 is an arbitrary value >= bootsect size +
+#                               setup size    +
+#                               stack size
 
 # After that (everything loaded), we jump to the setup-routine
 # loaded directly after the bootblock.
 
     ljmp    $SETUPSEG, $0
+
+# drive is assumed to be 0
+sread:      .word 0             # the current sector to read
+head:       .word 0             # the current head to read
+track:      .word 0             # the current track to read
+
+# read_it
+#
+# This routine is used to transfer the kernel stored at disk address
+# (drive=0, head=0, track=0, sector=5) in the RAM memory starting
+# at the address 0x1000:0. The interrupt 0x13 is used to execute this
+# operation.
+# A segment of 64Kb (64512) may contain 7 track of 18 sector each. Here we
+# read a track at a time (if possible). %es contain the reference to the 
+# destination segment and %bx the destination offset. When %bx cross the
+# 64Kb boundaries %es must be incremented and %bx updated accordingly
+
+read_it:
+    movb    setup_sects, %al
+    incb    %al
+    movb    %al, sread          # sread = 5 -> this is because the read start
+                                # from sector 5.
+    movw    %es, %ax            # AX = ES (0x1000)
+    testw   $0x0fff, %ax        # this instruction test that ES has one
+                                # of the following values: 0x1000, 0x2000, ...,
+                                # 0x9000. Basically we check that an invalid
+                                # value has not been used for $SYSSEG.
+die:
+    jne die
+
+    xorw    %bx, %bx            # ES:BX will contain the destination address
+                                # of the copy 0x1000:0
+
+rp_read:
+                                # Here start the loop.
+
+                                # Here a check is made to see if all the
+                                # necessary bytes have been read.
+    movw    %es, %ax
+    subw    $SYSSEG, %ax
+    movw    %bx, %cx
+    shr $4, %cx
+    add %cx, %ax                # AX = kernel bytes read
+    cmpw    syssize, %ax        # if (all bytes have been read)
+                                #       jump ok1_read -> need to read
+                                # else
+                                #       stop reading. You have finished.
+    jbe ok1_read
+    ret
+
+ok1_read:
+                                # ES contain the current segment and BX
+                                # the offset in that segment where finished the
+                                # last read_track.
+
+    movw    sectors, %ax        # AX = sector to read in the track (first loop
+                                # is 18)
+    subw    sread, %ax          # AX = AX - sread (subctract from AX the
+                                # sectors already read -> in the first loop
+                                # sread == 5 and AX == 13)
+    movw    %ax, %cx
+    shlw    $9, %cx
+    addw    %bx, %cx            # CX = the offset where the reading of the
+                                # track will finish. if CX does not cross
+                                # the 64Kb boundaries go to ok2_read,
+                                # otherwise a less number of sectors must be
+                                # read.
+    jnc ok2_read
+    je  ok2_read
+
+                                # the next read track cross the 64 Kb
+                                # boundaries so less sectors must be read. But
+                                # how many sector I can read? It is easy,
+                                # calculate the distance between BX and the
+                                # end of the segment and divide this value for
+                                # 512.
+    xorw    %ax, %ax
+    subw    %bx, %ax            # AX == distance between BX and the end of the
+                                # segment
+    shrw    $9, %ax             # AX == sectors to read
+
+ok2_read:
+    call    read_track          # ok, read the track ....
+
+    movw    %ax, %cx            # %ax contain the sectors read, sread contain
+                                # the start sector
+    addw    sread, %ax          #
+    cmpw    sectors, %ax        # if we do not have read the track completely
+                                # jump to ok3_read
+    jne ok3_read
+                                # If I well understand the reading of the
+                                # track will be in the following order:
+                                #
+                                #           (drive, head, track)
+                                #           (0, 0, 0)
+                                #           (0, 1, 0)
+                                #           (0, 0, 1)
+                                #           (0, 1, 1)
+                                #              ....
+                                # this to reduce the head movement.
+
+                                # a track has been read completely so here
+                                # there are two cases:
+                                #
+                                # a) for head n has been read both the
+                                #    tracks. In this case we have
+                                #
+                                #           head = 1-n
+                                #           track = track+1
+                                #
+                                # b) for head n only a track has been
+                                # read. In this case we have:
+                                #
+                                #           head = 1-n
+    movw    $1, %ax             #
+    subw    head, %ax           #
+    jne ok4_read                # jump to ok4_read if only 1 track has been read
+                                # for the head
+
+    incw    track               # ok, both the tracks have been read for the
+                                # head. Increment track.
+ok4_read:
+    movw    %ax, head           # head = AX
+    xorw    %ax, %ax            # AX = 0 -> in this case the reading start
+                                # from sector 0
+ok3_read:
+    movw    %ax, sread          # AX contain the sector where the read start
+                                # in the current track. Move this value in sread
+    shlw    $9, %cx             # CX = CX *512 -> byte read
+    addw    %cx, %bx            # BX = BX + CX -> move BX to the offset where
+                                # will start the next read_track.
+    jnc rp_read                 # if no 64Kb boundaries has been crossed goto
+                                # rp_read to continue the reading process
+
+    movw    %es, %ax            # incrementing BX we crossed the 64Kb
+                                # boundaries, so ES must point to the next
+                                # segment and BX must be 0
+    addb    $0x10, %ah
+    movw    %ax, %es
+    xorw    %bx, %bx
+    jmp rp_read
+
+read_track:
+    pusha                       # save registers (ax, cx, dx, bx, sp, bp, si
+                                # di)
+    pusha                       # save registers
+
+    movw    $0xe2e, %ax         # write a "." for each track read
+    movw    $7, %bx
+    int $0x10
+
+    popa                        # reload registers
+
+                                # use the service 2 of interrupt 0x13 to
+                                # read the (drive, head, track, sector).
+                                # See above for specification abount this
+                                # service.
+                                # The data are set in the following way:
+                                # %dh = 0 (drive 0)
+                                # %dl = head
+                                # %ch = track
+                                # %cl = sread
+                                # %es:%bx destination address
+                                # %ah = 0x02 (service)
+                                # %al = the sectors to read (first loop == 13)
+    movw    track, %dx
+    movw    sread, %cx
+    incw    %cx
+    movb    %dl, %ch
+    movw    head, %dx
+    movb    %dl, %dh
+    andw    $0x0100, %dx
+    movb    $2, %ah
+    pushw   %dx                 # save %ax, %bx, %cx, %dx for dump
+    pushw   %cx
+    pushw   %bx
+    pushw   %ax
+    int     $0x13
+    jc  bad_rt
+
+    addw    $8, %sp             # 4 registers have been put on the stack.
+                                # Discard them.
+    popa                        # Recover the registers.
+    ret
+
+bad_rt:
+    pushw   %ax                 # save error code
+    call    print_all           # dump registers
+    xorb    %ah, %ah            # %ah = 0
+    xorb    %dl, %dl            # %dl = 0
+    int     $0x13               # reset FDC
+    addw    $10, %sp            # 4 registers + 1 error code have been put
+                                # on the stack. Discard them.
+    popa                        # Recover the registers.
+    jmp read_track
 
 # kill_motor
 #
@@ -226,12 +472,22 @@ print_nl:
     int     $0x10
     ret
 
+# Change these setting a compile time
+# Disk 1.44Mb disks:
+sectors:    .word 18        # sectors = 18
+# Disk 1.2Mb disks:
+# sectors:  .word 15        # sectors = 15
+# Disk 720Kb disks:
+# sectors:  .word 9         # sectors = 9
+
 # This boot message start with a new line (CR=13, LF=10). So the string length
 # is 17 characters.
 msg1:       .byte 13, 10
             .ascii "Loading system "
 
-.org 509						# Last 3 bytes of the boot sector.
+.org 507						# Last 5 bytes of the boot sector.
+
 
 setup_sects:    .byte SETUPSECTS
+syssize:        .word SYSSIZE
 boot_flag:		.word 0xAA55	# Flag indicating a boot disk
