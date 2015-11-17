@@ -66,12 +66,12 @@ load_setup:
     xorb    %dl, %dl            # the service 0x00 of interrupt 0x13
     int     $0x13
 
-    xorw    %dx, %dx
-    movb    $0x02, %cl          # Copy the SETUPSECTS sectors from disk using
-    movw    $0x0200, %bx        # the service 0x02 of interrupt 0x13. The disk
-    movb    $0x02, %ah          # start address is (0, 0, 0, 2) and the sectors
-    movb    setup_sects, %al    # will be copied in memory at the address
-    int     $0x13               # 0x9000:0x0200
+    xorw    %dx, %dx            # Copy the SETUPSECTS sectors from disk using
+    movb    $0x02, %cl          # the service 0x02 of interrupt 0x13. The disk 
+    movw    $0x0200, %bx        # start address is (0, 0, 0, 2) and the sectors 
+    movb    $0x02, %ah          # will be copied in memory at the address 
+    movb    setup_sects, %al    # 0x9000:0x0200
+    int     $0x13
 
     jnc ok_load_setup
 
@@ -139,6 +139,7 @@ ok_load_setup:
                             # and move cursor
     int     $0x10
 
+                            # start loading the kernel at 0x1000:0
     movw    $SYSSEG, %ax
     movw    %ax, %es
     call read_it

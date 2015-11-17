@@ -160,6 +160,11 @@ end_move:
     lmsw    %ax
     call    delay
 
+    .byte   0x66, 0xea      # jmpi to the logic address (8, 0x1000).
+code32: .long   0x1000      # 8 is the selector and point to the second entry
+    .word   8               # in GDT (code segment) whose start address is 0.
+                            # So 0+0x1000=0x1000 -> jmpi 0x1000.
+
 done:
 	jmp done
 

@@ -1,5 +1,6 @@
 AS=as
 LD=ld
+CC=gcc
 CPP=gcc -E
 
 all: kernel bootsect setup image
@@ -26,8 +27,14 @@ setup.o: setup.s
 setup.s: setup.S
 	$(CPP) -traditional $< -o $@
 
-kernel: main.o
-	$(LD) -e stext -Ttext 0x1000 -s --oformat binary main.o -o $@
+kernel: head.o main.o
+	$(LD) -e stext -Ttext 0x1000 -s --oformat binary head.o main.o -o $@
+
+head.o: head.s
+	$(AS) -o $@ $<
+
+head.s: head.S
+	$(CPP) -traditional $< -o $@
 
 main.o: main.c
 	$(CC) -Wall -O -fstrength-reduce -fomit-frame-pointer -c $< -o  $@
@@ -41,9 +48,8 @@ image: bootsect setup kernel
 	cat kernel >> image
 
 clean:
-	rm *.o
-	rm *.s
-	rm image
+	rm -f *.o *.s
 	rm bootsect
 	rm setup
 	rm kernel
+	rm image
