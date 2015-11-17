@@ -98,8 +98,42 @@ end_move:
     lidt    idt_48          # base == 0, limit == 0
     lgdt    gdt_48          # limit == 2048 -> 256 entries
 
+# Enable A20
+    call    empty_8042
+    movb    $0xd1, %al
+    outb    %al, $0x64      # out[0x64] = 0xD1 -> command: write to output 
+                            # buffer
+    call    empty_8042		
+    movb    $0xdf, %al
+    outb    %al, $0x60      # out[0x60] = 0xDF -> bit 1 = 1 -> enable A20
+    call    empty_8042
+
 done:
 	jmp done
+
+# empty_8042
+# This routine empty the keyboard command queue.
+# The keyboard Status Register at port 0x64 has two bits (0 and 1) that
+# specify if there are data in the keyboard queue. Bit 0 says if keyboard
+# data are in queue (if equal to 1), Bit 0 says if user data are in queue
+# (if equal to 1). These two bits must be 0.
+
+empty_8042:
+    call    delay           # a small delay
+    inb $0x64, %al          # %al = in[0x64]
+    testb   $0x1, %al
+    jz  no_output           # if (bit %al[0] == 0) jump no_output
+    call    delay           # a small delay
+    inb $0x60, %al          # %al = in[0x60]
+    jmp empty_8042          # jump to empty_8042
+no_output:
+    testb   $2, %al         # if (bit %al[1] == 1) jump empty_8042
+    jnz empty_8042
+    ret
+
+delay:
+    .word   0x00eb      # make a short jump call jmp $+2
+    ret
 
 prtstr: lodsb               # load the character to print from DS:SI to AX
         andb    %al,%al
