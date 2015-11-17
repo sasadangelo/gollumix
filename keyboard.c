@@ -30,12 +30,17 @@ typedef void (*fptr)(int);
 unsigned char kmode   = 0;
 unsigned char ke0     = 0;
 unsigned char kleds   = NUMLED;
+unsigned char kapplic = 0;
 
 static fptr key_table[];
 
 static unsigned char old_leds = NUMLED;
+static int npadch = 0;
 
 extern void kb_intr(void);
+
+static void applkey(int key);
+static void reboot(void);
 
 /*
  * the keyboard interrupt handler. Here it prints a simple "Hello" message.
@@ -141,6 +146,12 @@ static void do_self(int sc) {
 }
 
 static void enter(int sc) {
+    if (ke0 != 1)
+        do_self(sc);
+    else if (kapplic)
+        applkey('M');
+    else
+        do_self(sc);
 }
 
 static void ctrl(int sc) {
@@ -194,6 +205,13 @@ static void unalt(int sc) {
         kmode&=(~ALTGR);
     } else {
         kmode&=(~ALT);
+
+        // check if we press ALT-char code. For example if we press
+		// ALT-126 the ~ character should be printed.
+		if (npadch != 0) {
+			printk("%c", npadch);
+		    npadch=0;
+		}
     }
 }
 
@@ -226,18 +244,79 @@ static void func(int sc) {
 }
 
 static void num(int sc) {
+    if (kapplic)
+        applkey(0x50);
+    else {
+        kleds^=NUMLED;
+        set_leds();
+    }
 }
 
 static void scroll(int sc) {
 }
 
 static void cursor(int sc) {
+    unsigned char ch;
+
+    if (sc < 0x47 || sc > 0x53) {
+        return;
+	}
+
+	sc-=0x47;
+
+	// if CTRL-ALT-DEL has been pressed, reboot the machine
+    if (sc == 12 && (kmode&(LCTRL|RCTRL)) && (kmode&(ALT|ALTGR))) {
+        reboot();
+        return;
+    }
+
+    if (ke0 == 1) {
+        //cur(sc);
+        return;
+    }
+
+    // the user is pressing ALT-numpad.
+    if ((kmode & ALT) && sc!=12) {
+        npadch=npadch*10 + pad_map[sc];
+        return;
+    }
+
+    if (kleds & NUMLED) {
+        ch = num_map[sc];
+
+		printk("%c", ch);
+    }
 }
 
 static void minus(int sc) {
 }
 
 static void plus(int sc) {
+}
+
+long no_idt[2] = {0, 0};
+
+/*
+ * This routine reboots the machine by asking the keyboard
+ * controller to pulse the reset-line low. We try that for a while,
+ * and if it doesn't work, we do some other stupid things.
+ */
+static void reboot(void) {
+    int i;
+
+    sti();
+    for (;;) {
+        for (i=0; i<100; i++) {
+            kb_wait();
+            *((unsigned short *)0x472)=0x1234;
+            outb(0xfe,0x64);     /* pulse reset low */
+        }
+        __asm__("\tlidt no_idt"::);
+    }
+}
+
+static void applkey(int key) {
+    // not implemented here
 }
 
 static fptr key_table[] = {

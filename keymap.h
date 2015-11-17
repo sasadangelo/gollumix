@@ -55,6 +55,9 @@ static unsigned char alt_map[] = {
        0,    0,    0,    0,    0,    0,    0,    0,
        0 };
 
+static unsigned char num_map[] = "789-456+1230,";
+static unsigned int  pad_map[] = { 7, 8, 9, 0, 4, 5, 6, 0, 1, 2, 3, 0, 0 };
+
 #elif defined KBD_IT
 
 static unsigned char key_map[] = {
@@ -101,6 +104,9 @@ static unsigned char alt_map[] = {
        0,    0,    0,    0,    0,    0,    0,    0,
        0,    0,    0,    0,    0,    0,    0,    0,
        0 };
+
+static unsigned char num_map[] = "789-456+1230,";
+static unsigned int  pad_map[] = { 7, 8, 9, 0, 4, 5, 6, 0, 1, 2, 3, 0, 0 };
 
 #else
 #error "Keyboard-type not supported"

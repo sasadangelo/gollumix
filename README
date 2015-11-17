@@ -1,5 +1,7 @@
 Add the support for:
 
-- CAPS LOCK
-
-and its relative led.
+- ENTER
+- ALT - nnn i.e ALT - 126 --> ~
+- reboot with ALT-CTRL-CANC
+- Pad keyboard
+- Num keyboard
