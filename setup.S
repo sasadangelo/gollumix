@@ -94,6 +94,10 @@ end_move:
     leaw    msg, %si        # Print the message "Setting up system"
     call    prtstr
 
+# Set the IDTR and GDTR registers
+    lidt    idt_48          # base == 0, limit == 0
+    lgdt    gdt_48          # limit == 2048 -> 256 entries
+
 done:
 	jmp done
 
@@ -115,6 +119,38 @@ prnt1:                      # use the service 0x0E of interrupt 0x10 to print
         popw    %cx
         popw    %ax
         ret
+
+# First three entries of GDT
+
+gdt:
+
+# Dummy Descriptor
+
+        .word   0, 0, 0, 0
+
+# Kernel Code Segment Descriptor
+                        
+        .word   0xFFFF      # 4Gb - (0x100000*0x1000 = 4Gb)
+        .word   0           # base address = 0
+        .word   0x9A00      # code read/exec
+        .word   0x00CF      # granularity = 4096, 386
+                            #  (+5th nibble of limit)
+
+# Kernel Data Segment Descriptor
+
+        .word   0xFFFF      # 4Gb - (0x100000*0x1000 = 4Gb)
+        .word   0           # base address = 0
+        .word   0x9200      # data read/write
+        .word   0x00CF      # granularity = 4096, 386
+                            #  (+5th nibble of limit)
+
+# Values for IDTR and GDTR
+idt_48:
+        .word   0           # idt limit = 0
+        .word   0, 0        # idt base = 0L
+gdt_48:
+        .word   0x8000      # gdt limit=2048, 256 GDT entries
+        .long   gdt + SETUPSEG*0x10
 
 msg:    .byte 13, 10
         .ascii "Setting up system"
