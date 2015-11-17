@@ -24,7 +24,7 @@ _start:
 #    ---------------
 #   |               |
 #   |_______________|
-#   |   BOOTSECTOR  | 0x07C0:0
+#   |   BOOTSECTOR  | 0x7C0:0
 #   |               |
 #   |go: ....       |
 #   |               |
@@ -43,6 +43,11 @@ _start:
 #   |_______________|
 
 go:
+    movw    $0x4000-12, %di
+    movw    %ax, %ds            # %ds = 0x9000
+    movw    %ax, %ss            # %ss = 0x9000
+    movw    %di, %sp            # %sp = 0x4000-12
+
     movb $0xE, %ah              # Function 0x0E of Interrupt 0x10
     movb $'H', %al              # write 'H'
     int  $0x10
