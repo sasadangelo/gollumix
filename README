@@ -1,1 +1,4 @@
-The keyboard driver print the scan code of the keys pressed and released.
+In this step we convert the scan code in ASCII only the key letter ('A', 'B'
+..., the numer '1', '2' ...)
+
+CTRL-SHIFT-ALT-ALTGR-FN are not handled here.

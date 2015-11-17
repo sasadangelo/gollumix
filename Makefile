@@ -3,6 +3,10 @@ LD=ld
 CC=gcc
 CPP=gcc -E
 
+# Please select your keyboard map
+#KEYBOARD = -DKBD_US
+KEYBOARD = -DKBD_IT
+
 KERNEL_OBJ=head.o main.o tty_io.o keyboard.o console.o asm.o vsprintf.o
 
 all: image
@@ -35,7 +39,7 @@ head.s: head.S
 	$(CPP) -traditional $< -o $@
 
 .c.o:
-	$(CC) -I. -nostdinc -Wall -O -fomit-frame-pointer -c $< -o  $@
+	$(CC) $(KEYBOARD) -I. -nostdinc -Wall -O -fomit-frame-pointer -c $< -o  $@
 
 asm.o: asm.S
 	gcc -c -o $@ $<
