@@ -1,4 +1,2 @@
-In this step we convert the scan code in ASCII only the key letter ('A', 'B'
-..., the numer '1', '2' ...)
-
-CTRL-SHIFT-ALT-ALTGR-FN are not handled here.
+Add the support for SHIFT key. Pressing SHIFT-key letter an upper case letter
+is displayed.

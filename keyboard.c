@@ -3,7 +3,12 @@
 #include "kernel.h"
 #include "keymap.h"
 
+#define LSHIFT   0x01
+#define RSHIFT   0x02
+
 typedef void (*fptr)(int);
+
+unsigned char kmode   = 0;
 
 static fptr key_table[];
 
@@ -48,7 +53,11 @@ static void none(int sc) {
 static void do_self(int sc) {
 	unsigned char ch;
 
-	ch=key_map[sc];
+    if (kmode & (LSHIFT|RSHIFT)) {
+	    ch=shift_map[sc];
+	} else {
+        ch=key_map[sc];
+	}
 
 	if (ch == 0) {
 		return;
@@ -67,18 +76,22 @@ static void unctrl(int sc) {
 }
 
 static void lshift(int sc) {
+	kmode|=LSHIFT;
 }
 
 static void unlshift(int sc) {
+	kmode&=(~LSHIFT);
 }
 
 static void slash(int sc) {
 }
 
 static void rshift(int sc) {
+	kmode|=RSHIFT;
 }
 
 static void unrshift(int sc) {
+	kmode&=(~RSHIFT);
 }
 
 static void star(int sc) {
