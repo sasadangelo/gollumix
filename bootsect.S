@@ -4,8 +4,8 @@ INITSEG    = 0x9000
 SETUPSEG   = 0x9020
 SYSSEG     = 0x1000
 SYSSIZE    = 0x7F00             # This value is put in the syssize variable
-                                # (see below). The value reported here is a 
-                                # dummy value, it will be replaced by the 
+                                # (see below). The value reported here is a
+                                # dummy value, it will be replaced by the
                                 # build.c utility. Please see the code in
                                 # tools/build.c.
 .code16

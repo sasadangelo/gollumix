@@ -1,1 +1,4 @@
-Jump al codice kernel
+Start writing the Keyboard driver.
+
+In this step a keyboard interrupt handler is implemented 
+printing the message "Hello Keyboard" when a key is pressed.
