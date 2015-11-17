@@ -1,3 +1,10 @@
+/*
+ * keyboard.c
+ *
+ * Copyright (C) 2003 Open Community
+ * author Salvatore D'Angelo (koala.gnu@tiscali.it)
+ */
+
 #include "io.h"
 #include "system.h"
 #include "kernel.h"
@@ -9,13 +16,24 @@
 #define RCTRL    0x08
 #define ALT      0x10
 #define ALTGR    0x20
+#define CAPS     0x40
+#define CAPSDOWN 0x80
+
+#define SCRLED   0x01
+#define NUMLED   0x02
+#define CAPSLED  0x04
+
+#define KBD_ACK  0xFA
 
 typedef void (*fptr)(int);
 
 unsigned char kmode   = 0;
 unsigned char ke0     = 0;
+unsigned char kleds   = NUMLED;
 
 static fptr key_table[];
+
+static unsigned char old_leds = NUMLED;
 
 extern void kb_intr(void);
 
@@ -53,10 +71,33 @@ void keyboard_init(void) {
     set_intr_gate(0x21, &kb_intr);
     outb_p(inb_p(0x21) & 0xfd, 0x21);
 
-	// disable/enable the keyboard
+    // disable/enable the keyboard
     a=inb_p(0x61);
     outb_p(a|0x80, 0x61);
     outb(a, 0x61);
+}
+
+/*
+ * kb_wait waits for the keyboard controller buffer to empty.
+ */
+static void kb_wait(void) {
+    int i;
+
+    for (i=0; i<0x10000; i++) {
+        if ((inb(0x64) & 0x02) == 0) {
+            break;
+		}
+	}
+}
+
+void kb_ack(void) {
+    int i;
+
+    for(i=0; i<0x10000; i++) {
+        if (inb(0x60) == KBD_ACK) {
+            break;
+        }
+    }
 }
 
 static void none(int sc) {
@@ -79,7 +120,7 @@ static void do_self(int sc) {
 
     // If CTRL is active the character CTRL-A == 0x01, CTRL-B == 0x02,
     // CTRL-Z == 0x1A.
-    if (kmode & (LCTRL|RCTRL)) {
+    if (kmode & (LCTRL|RCTRL|CAPS)) {
         if ((ch>='a' && ch <='z') || (ch>=224 && ch<=254)) {
             ch -= 32;
         }
@@ -156,10 +197,29 @@ static void unalt(int sc) {
     }
 }
 
+void set_leds(void) {
+    if (kleds != old_leds) {
+        old_leds=kleds;
+        kb_wait();
+        outb(0xED, 0x60);
+        kb_ack();
+        kb_wait();
+        outb(kleds, 0x60);
+        kb_ack();
+    }
+}
+
 static void caps(int sc) {
+    if (!(kmode&CAPSDOWN)) {
+	    kleds^=CAPSLED;
+        kmode^=CAPS;
+        kmode|=CAPSDOWN;
+        set_leds();
+    }
 }
 
 static void uncaps(int sc) {
+	kmode&=(~CAPSDOWN);
 }
 
 static void func(int sc) {
