@@ -1,1 +1,1 @@
-Set the stack region starting from 0x9000:0x4000-12.
+Add the routine kill_motor to our code to stop the floppy motor after the read.

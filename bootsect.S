@@ -43,10 +43,16 @@ _start:
 #   |_______________|
 
 go:
+
+# set the stack segment. It will start from 0x9000:0x4000-12 (in fact SS:SP
+# will be set with this value) and it will grow along the top direction
+
     movw    $0x4000-12, %di
     movw    %ax, %ds            # %ds = 0x9000
     movw    %ax, %ss            # %ss = 0x9000
     movw    %di, %sp            # %sp = 0x4000-12
+
+# print the "Hello World!!!" message.
 
     movb $0xE, %ah              # Function 0x0E of Interrupt 0x10
     movb $'H', %al              # write 'H'
@@ -77,9 +83,23 @@ go:
     int  $0x10
     movb $'!', %al              # write '!'
     int  $0x10
+	call kill_motor				# stop the floppy motor
 
 done:                           # infinite loop
 	jmp done
+
+# kill_motor
+#
+# This procedure turns off the floppy drive motor, so that we enter the kernel
+# in a known state, and don't have to worry about it later. 
+# To turn off the floppy motor is necessary write 0 on the 0x3f2 I/O port.
+
+kill_motor:
+    movw    $0x3f2, %dx
+    xorb    %al, %al
+    outb    %al, %dx            # out[0x3f2] = 0
+    .word   0x00eb, 0x00eb      # perform short jmp delays
+    ret
 
 .org 510						# Last 2 bytes of the boot sector.
 
