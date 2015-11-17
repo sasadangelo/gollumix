@@ -1,7 +1,7 @@
 AS=as
 LD=ld
 
-all: bootsect
+all: bootsect image
 
 bootsect: bootsect.o
 	$(LD) -Ttext 0x0 -s --oformat binary -o $@ $<

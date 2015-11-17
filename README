@@ -1,2 +1,2 @@
-This simple example shows how to write a simple "Hello World!!!" message
-through a boot disk.
+Move the boot sector from 0:0x07C0 to 0x9000:0. In the new location we print the
+"Hello World!!!" message to check if the copy is successful.
