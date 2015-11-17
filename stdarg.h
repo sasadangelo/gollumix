@@ -1,3 +1,10 @@
+/*
+ * stdarg.h
+ *
+ * Copyright (C) 2003 Open Community
+ * author Salvatore D'Angelo (koala.gnu@tiscali.it)
+ */
+
 #ifndef STDARG_H
 #define STDARG_H
 

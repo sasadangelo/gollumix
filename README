@@ -1,7 +1,7 @@
 Add the support for:
 
-- ENTER
-- ALT - nnn i.e ALT - 126 --> ~
-- reboot with ALT-CTRL-CANC
-- Pad keyboard
-- Num keyboard
+- / on keypad
+- * on keypad
+- scroll
+- + on keypad
+- - on keypad

@@ -1,3 +1,10 @@
+/*
+ * string.h
+ *
+ * Copyright (C) 2003 Open Community
+ * author Salvatore D'Angelo (koala.gnu@tiscali.it)
+ */
+
 #ifndef STRING_H
 #define STRING_H
 

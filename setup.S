@@ -1,3 +1,9 @@
+/*
+ * setup.S
+ *
+ * Copyright (C) 2003 Open Community
+ * author Salvatore D'Angelo (koala.gnu@tiscali.it)
+ */
 SETUPSEG = 0x9020
 
 .code16

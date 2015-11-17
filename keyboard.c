@@ -179,6 +179,13 @@ static void unlshift(int sc) {
 }
 
 static void slash(int sc) {
+    if (ke0 != 1) {
+        do_self(sc);
+    } else if (kapplic) {
+        applkey('Q');
+    } else {
+		printk("/");
+    }
 }
 
 static void rshift(int sc) {
@@ -190,6 +197,10 @@ static void unrshift(int sc) {
 }
 
 static void star(int sc) {
+    if (kapplic)
+        applkey('R');
+    else
+        do_self(sc);
 }
 
 static void alt(int sc) {
@@ -253,6 +264,8 @@ static void num(int sc) {
 }
 
 static void scroll(int sc) {
+    kleds^=SCRLED;
+    set_leds();
 }
 
 static void cursor(int sc) {
@@ -289,9 +302,18 @@ static void cursor(int sc) {
 }
 
 static void minus(int sc) {
+    if (kapplic) {
+        applkey('S');
+    } else {
+        do_self(sc);
+    }
 }
 
 static void plus(int sc) {
+    if (kapplic)
+        applkey('l');
+    else
+        do_self(sc);
 }
 
 long no_idt[2] = {0, 0};

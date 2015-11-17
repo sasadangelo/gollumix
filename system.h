@@ -1,3 +1,10 @@
+/*
+ * system.h
+ *
+ * Copyright (C) 2003 Open Community
+ * author Salvatore D'Angelo (koala.gnu@tiscali.it)
+ */
+
 #ifndef SYSTEM_H
 #define SYSTEM_H
 

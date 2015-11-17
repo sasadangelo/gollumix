@@ -49,8 +49,8 @@ void con_init(void) {
     // goto (0, 0) on the screen
     gotoxy(0, 0);
 
-	// initialize the keyboard driver
-	keyboard_init();
+    // initialize the keyboard driver
+    keyboard_init();
 }
 
 static void clear_line(int n) {
@@ -91,7 +91,7 @@ static inline void set_6845(int reg, int val) {
 }
 
 static inline void set_cursor_pos(void) {
-	set_6845(14, (VIDEO-MEM_VIDEO)/2 + Y*SCR_W+X);
+    set_6845(14, (VIDEO-MEM_VIDEO)/2 + Y*SCR_W+X);
 }
 
 static char buf[1024];
@@ -119,7 +119,7 @@ static inline void print_char(char c) {
         X = X%SCR_W;
     }
 
-	if (Y>=SCR_H) {
+    if (Y>=SCR_H) {
         scroll_screen();
         Y = SCR_H-1;
     }
