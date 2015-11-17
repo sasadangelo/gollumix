@@ -108,6 +108,13 @@ end_move:
     outb    %al, $0x60      # out[0x60] = 0xDF -> bit 1 = 1 -> enable A20
     call    empty_8042
 
+# Reset coprocessor
+    xorw    %ax, %ax
+    outb    %al, $0xf0      # out[0xF0] = 0
+    call    delay
+    outb    %al, $0xf1      # out[0xF1] = 0
+    call    delay
+
 done:
 	jmp done
 
