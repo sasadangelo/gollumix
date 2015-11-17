@@ -1,1 +1,1 @@
-Move the kernel from 0x10000 to 0x01000.
+Print the message "Setting up system".

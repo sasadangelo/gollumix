@@ -89,49 +89,36 @@ end_move:
 #   |   (12 bytes)  |
 #   |_______________| <- 0x9000:0x4000
 
+# Setting up the system.
 
-    movb    $0xe, %ah           # Function 0x0E of Interrupt 0x10
-	movb    $13, %al            # print new line
-	int     $0x10
-    movb    $10, %al
-    int     $0x10
-    movb    $'W', %al           # write 'W'
-    int     $0x10
-    movb    $'o', %al           # write 'o'
-    int     $0x10
-    movb    $'w', %al           # write 'w'
-    int     $0x10
-    movb    $' ', %al           # write ' '
-    int     $0x10
-    movb    $'I', %al           # write 'I'
-    int     $0x10
-    movb    $' ', %al           # write ' '
-    int     $0x10
-    movb    $'a', %al           # write 'a'
-    int     $0x10
-    movb    $'m', %al           # write 'm'
-    int     $0x10
-    movb    $' ', %al           # write ' '
-    int     $0x10
-    movb    $'i', %al           # write 'i'
-    int     $0x10
-    movb    $'n', %al           # write 'n'
-    int     $0x10
-    movb    $' ', %al           # write ' '
-    int     $0x10
-    movb    $'s', %al           # write 's'
-    int     $0x10
-    movb    $'e', %al           # write 'e'
-    int     $0x10
-    movb    $'t', %al           # write 't'
-    int     $0x10
-    movb    $'u', %al           # write 'u'
-    int     $0x10
-    movb    $'p', %al           # write 'p'
-    int     $0x10
+    leaw    msg, %si        # Print the message "Setting up system"
+    call    prtstr
 
 done:
 	jmp done
+
+prtstr: lodsb               # load the character to print from DS:SI to AX
+        andb    %al,%al
+        jz      fin         # print the character until AL is 0x0
+        call    prnt1       # print the character at DS:SI
+        jmp     prtstr
+fin:    ret
+
+prnt1:                      # use the service 0x0E of interrupt 0x10 to print
+                            # the character in %al.
+        pushw   %ax
+        pushw   %cx
+        xorb    %bh,%bh
+        movw    $0x01, %cx
+        movb    $0x0e, %ah
+        int     $0x10
+        popw    %cx
+        popw    %ax
+        ret
+
+msg:    .byte 13, 10
+        .ascii "Setting up system"
+        .byte 0x0
 
 .org 2048
 
