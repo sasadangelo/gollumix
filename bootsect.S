@@ -1,11 +1,13 @@
-# SYSSIZE will be written during the build phase and it will be equal to the
-# size of the kernel image in 16 bytes click.
-SETUPSECTS  = 4
-BOOTSEG = 0x07C0
-INITSEG = 0x9000
-SETUPSEG= 0x9020
-SYSSEG   = 0x1000
-
+SETUPSECTS = 4
+BOOTSEG    = 0x07C0
+INITSEG    = 0x9000
+SETUPSEG   = 0x9020
+SYSSEG     = 0x1000
+SYSSIZE    = 0x7F00             # This value is put in the syssize variable
+                                # (see below). The value reported here is a 
+                                # dummy value, it will be replaced by the 
+                                # build.c utility. Please see the code in
+                                # tools/build.c.
 .code16
 .text
 
@@ -488,7 +490,8 @@ msg1:       .byte 13, 10
 
 .org 507						# Last 5 bytes of the boot sector.
 
-
+# The value in setup_sects and syssize will be replace in the build.c utility.
+# Please see the tools/build.c.
 setup_sects:    .byte SETUPSECTS
 syssize:        .word SYSSIZE
 boot_flag:		.word 0xAA55	# Flag indicating a boot disk

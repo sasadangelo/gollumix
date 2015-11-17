@@ -1,6 +1,6 @@
 .text
 
-.globl stext
+.global stext
 .align 4,0x90
 stext:
 

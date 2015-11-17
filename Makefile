@@ -3,16 +3,12 @@ LD=ld
 CC=gcc
 CPP=gcc -E
 
-all: kernel bootsect setup image
+all: kernel bootsect setup ./tools/build image
 
 bootsect: bootsect.o
 	$(LD) -Ttext 0x0 -s --oformat binary -o $@ $<
 
 bootsect.o: bootsect.s
-	(echo -n "SYSSIZE = ("; echo -n `ls -gG kernel | cut -c16-24`; \
-		echo "+ 15 ) / 16") > tmp.s
-	cat bootsect.s >> tmp.s
-	mv tmp.s bootsect.s
 	$(AS) -o $@ $<
 
 bootsect.s: bootsect.S
@@ -42,10 +38,11 @@ main.o: main.c
 disk: image
 	dd if=image of=/dev/fd0 bs=512
 
-image: bootsect setup kernel
-	cat bootsect > image
-	cat setup >> image
-	cat kernel >> image
+image: bootsect setup kernel ./tools/build
+	./tools/build bootsect setup kernel > image
+
+./tools/build: ./tools/build.c
+	$(CC) -o ./tools/build ./tools/build.c
 
 clean:
 	rm -f *.o *.s
@@ -53,3 +50,4 @@ clean:
 	rm setup
 	rm kernel
 	rm image
+	rm ./tools/build
