@@ -1,9 +1,1 @@
-Add two debug routines
-
-	print_all
-	print_hex
-
-The former print the error code and the registers AX, BX, CX e DX.
-The latter print the word pointed by SS:BP.
-
-Moreover, the message "Loading system" will be printed using the 0x03 service of 0x10 interrupt.
+Jump to the setup code, where the string "Wow I am in setup" is printed.

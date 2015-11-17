@@ -1,6 +1,7 @@
 SETUPSECTS  = 4
 BOOTSEG = 0x07C0
 INITSEG = 0x9000
+SETUPSEG= 0x9020
 
 .code16
 .text
@@ -134,10 +135,12 @@ ok_load_setup:
     movw    $0x1301, %ax    # write string at row %dh and col %dl
                             # and move cursor
     int     $0x10
-	call kill_motor				# stop the floppy motor
+	call kill_motor         # stop the floppy motor
 
-done:                           # infinite loop
-	jmp done
+# After that (everything loaded), we jump to the setup-routine
+# loaded directly after the bootblock.
+
+    ljmp    $SETUPSEG, $0
 
 # kill_motor
 #
