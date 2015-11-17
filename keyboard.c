@@ -38,6 +38,7 @@ static unsigned char old_leds = NUMLED;
 static int npadch = 0;
 
 extern void kb_intr(void);
+extern void switch_to_console(int n);
 
 static void applkey(int key);
 static void reboot(void);
@@ -70,6 +71,8 @@ void keyboard_interrupt(void) {
 void keyboard_init(void) {
     register unsigned char a;
 
+    printk("Keyboard:");
+
     // programming the PIC 8259 Master Controller in order to associate IRQ1
     // to the keyboard interrupt handler. Remember the interrupt
     // vector of IRQ1 is 0x21 (see PIC programming in setup.S).
@@ -80,6 +83,8 @@ void keyboard_init(void) {
     a=inb_p(0x61);
     outb_p(a|0x80, 0x61);
     outb(a, 0x61);
+
+    printk(" ok!\n");
 }
 
 /*
@@ -252,6 +257,22 @@ static void uncaps(int sc) {
 }
 
 static void func(int sc) {
+    if (sc < 0x3b) {
+        return;
+    }
+
+    sc-=0x3b;
+    if (sc > 9) {
+        sc-=18;
+        if (sc < 10 || sc > 11)
+            return;
+    }
+
+    if ((kmode & (LCTRL|RCTRL)) && (kmode & ALT)) {
+        switch_to_console(sc+1);
+    } else {
+        printk("%s", func_map[sc]);
+    }
 }
 
 static void num(int sc) {

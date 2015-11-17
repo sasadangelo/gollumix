@@ -1,7 +1,1 @@
-Add the support for:
-
-- / on keypad
-- * on keypad
-- scroll
-- + on keypad
-- - on keypad
+Add the support for 4 consoles and use ALT-Fn k to switch to the k console.

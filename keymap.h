@@ -58,6 +58,12 @@ static unsigned char alt_map[] = {
 static unsigned char num_map[] = "789-456+1230,";
 static unsigned int  pad_map[] = { 7, 8, 9, 0, 4, 5, 6, 0, 1, 2, 3, 0, 0 };
 
+static char *func_map[] = {
+    "\033[[A", "\033[[B", "\033[[C", "\033[[D",
+    "\033[[E", "\033[[F", "\033[[G", "\033[[H",
+    "\033[[I", "\033[[J", "\033[[K", "\033[[L"
+};
+
 #elif defined KBD_IT
 
 static unsigned char key_map[] = {
@@ -107,6 +113,12 @@ static unsigned char alt_map[] = {
 
 static unsigned char num_map[] = "789-456+1230,";
 static unsigned int  pad_map[] = { 7, 8, 9, 0, 4, 5, 6, 0, 1, 2, 3, 0, 0 };
+
+static char *func_map[] = {
+    "\033[[A", "\033[[B", "\033[[C", "\033[[D",
+    "\033[[E", "\033[[F", "\033[[G", "\033[[H",
+    "\033[[I", "\033[[J", "\033[[K", "\033[[L"
+};
 
 #else
 #error "Keyboard-type not supported"

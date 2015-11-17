@@ -100,6 +100,19 @@ end_move:
     leaw    msg, %si        # Print the message "Setting up system"
     call    prtstr
 
+# Read cursor position and save it in 0x94010 location. When the console
+# will be initialized, this value will be retrieved to initialize the
+# cursor position.
+
+    movb    $0x03, %ah
+    xorb    %bh, %bh
+    int $0x10
+
+    movw    $0x9000, %ax
+    movw    %ax, %es
+    movw    $0x4010, %di
+    movw    %dx, %es:(%di)
+
 # Set the IDTR and GDTR registers
     lidt    idt_48          # base == 0, limit == 0
     lgdt    gdt_48          # limit == 2048 -> 256 entries

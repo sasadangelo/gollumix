@@ -1,12 +1,23 @@
+/*
+ * console.c
+ *
+ * Copyright (C) 2003 Open Community
+ * author Salvatore D'Angelo (koala.gnu@tiscali.it)
+ */
+
 #include "system.h"
 #include "vsprintf.h"
 #include "io.h"
 #include "kernel.h"
 #include "string.h"
 
+#define N_CONSOLES   4
 #define MEM_VIDEO   0xb8000
 #define SCR_W       80
 #define SCR_H       25
+#define SCR_SIZE    (SCR_W*SCR_H*2)
+
+#define is_valid_console(n) ((n)>=1 && (n)<=N_CONSOLES)
 
 struct console_s {
     unsigned long video;    // start video RAM for console n
@@ -15,20 +26,35 @@ struct console_s {
     unsigned char attr;
 };
 
-/* Current console: */
-static struct console_s cc = { MEM_VIDEO, MEM_VIDEO, 0, 0, 0x07};
+#define MAKE_CONSOLE(n) { \
+    MEM_VIDEO + SCR_SIZE*(n-1), \
+    MEM_VIDEO + SCR_SIZE*(n-1), \
+    0,0,0x07}
 
-#define VIDEO (cc.video)
-#define X     (cc.x)
-#define Y     (cc.y)
-#define POS   (cc.pos)
-#define ATTR  (cc.attr)
+static struct console_s console[N_CONSOLES+1] = {
+    MAKE_CONSOLE(1),    // Not used
+    MAKE_CONSOLE(1),    // Console 1
+    MAKE_CONSOLE(2),    // Console 2
+    MAKE_CONSOLE(3),    // Console 3
+    MAKE_CONSOLE(4),    // Console 4
+};
+
+/* Current console: */
+static struct console_s *cc = &console[1];
+
+#define VIDEO (cc->video)
+#define X     (cc->x)
+#define Y     (cc->y)
+#define POS   (cc->pos)
+#define ATTR  (cc->attr)
 
 typedef struct {
-    short data[80];
+    short data[SCR_W];
 } LINE;
 
 extern void keyboard_init(void);
+
+static void scroll_screen(void);
 
 /*
  * This routine move the cursor on the position (new_x, new_y).
@@ -46,8 +72,18 @@ static inline void gotoxy(unsigned int new_x,unsigned int new_y) {
  * keyboard and video.
  */
 void con_init(void) {
-    // goto (0, 0) on the screen
-    gotoxy(0, 0);
+    // the memory location 0x94010 contains the current cursor position.
+    // Please see setup.S.
+    unsigned char y = *(unsigned char *)(0x94011);
+
+    // if the boot process has printed the last line at the bottom of the
+    // screen, it is scrolled and the printing continue to the last line.
+    if (++y >= SCR_H) {
+        scroll_screen();
+        y = SCR_H-1;
+    }
+
+    gotoxy(0, y);
 
     // initialize the keyboard driver
     keyboard_init();
@@ -94,8 +130,6 @@ static inline void set_cursor_pos(void) {
     set_6845(14, (VIDEO-MEM_VIDEO)/2 + Y*SCR_W+X);
 }
 
-static char buf[1024];
-
 static inline void print_char(char c) {
     switch (c) {
     case '\n':
@@ -118,7 +152,6 @@ static inline void print_char(char c) {
         Y += X/SCR_W;  // new line
         X = X%SCR_W;
     }
-
     if (Y>=SCR_H) {
         scroll_screen();
         Y = SCR_H-1;
@@ -127,7 +160,9 @@ static inline void print_char(char c) {
     POS=VIDEO+((Y*SCR_W+X)<<1);
     set_cursor_pos();
 }
-																			//
+
+static char buf[1024];
+
 asmlinkage int printk(const char *fmt, ...) {
     va_list args;
     int len;
@@ -145,4 +180,25 @@ asmlinkage int printk(const char *fmt, ...) {
 
     restore_flags(flags);
     return len;
+}
+
+static inline void set_origin(void) {
+    outb_p(12,0x3d4);
+    outb_p(0xff&((VIDEO-MEM_VIDEO)>>9),0x3d5);
+    outb_p(13,0x3d4);
+    outb_p(0xff&((VIDEO-MEM_VIDEO)>>1),0x3d5);
+}
+
+void switch_to_console(int n) {
+    long flags;
+
+    if (is_valid_console(n) && cc != &console[n]) {
+        save_flags(flags); cli();
+
+        cc = &console[n];
+        set_origin();
+        set_cursor_pos();
+
+        restore_flags(flags);
+    }
 }
