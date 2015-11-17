@@ -1,5 +1,5 @@
 AS=as
-LD=ld
+LD=ld 
 CC=gcc
 CPP=gcc -E
 
@@ -35,7 +35,7 @@ head.s: head.S
 	$(CPP) -traditional $< -o $@
 
 .c.o:
-	$(CC) -Wall -O -fstrength-reduce -fomit-frame-pointer -c $< -o  $@
+	$(CC) -I. -nostdinc -Wall -O -fomit-frame-pointer -c $< -o  $@
 
 asm.o: asm.S
 	gcc -c -o $@ $<

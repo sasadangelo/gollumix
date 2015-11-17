@@ -8,7 +8,15 @@ extern void kb_intr(void);
  * the keyboard interrupt handler. Here it prints a simple "Hello" message.
  */
 void keyboard_interrupt(void) {
-	printk("Hello Keyboard\n");
+	unsigned char scancode, x;
+
+    scancode=inb_p(0x60);
+    x=inb_p(0x61);
+    outb_p(x|0x80, 0x61);
+    outb_p(x&0x7f, 0x61);
+    outb(0x20, 0x20);
+
+    printk("Scan code = %d \n", scancode);
 }
 
 /*

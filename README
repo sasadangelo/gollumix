@@ -1,1 +1,1 @@
-Define an important debug routine: printk.
+The keyboard driver print the scan code of the keys pressed and released.

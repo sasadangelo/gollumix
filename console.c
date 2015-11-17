@@ -46,7 +46,7 @@ static inline void gotoxy(unsigned int new_x,unsigned int new_y) {
  * keyboard and video.
  */
 void con_init(void) {
-    // goto to (0, 0) on the screen
+    // goto (0, 0) on the screen
     gotoxy(0, 0);
 
 	// initialize the keyboard driver

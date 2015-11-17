@@ -53,11 +53,15 @@ static char * number(char * str, int num, int base, int size, int precision
 		if (base==16) size -= 2;
 		else if (base==8) size--;
 	}
+
 	i=0;
-	if (num==0)
+	if (num==0) {
 		tmp[i++]='0';
-	else while (num!=0)
-		tmp[i++]=digits[do_div(num,base)];
+	} else {
+		while (num!=0) {
+		    tmp[i++]=digits[do_div(num,base)];
+		}
+	}
 	if (i>precision) precision=i;
 	size -= precision;
 	if (!(type&(ZEROPAD+LEFT)))
@@ -85,20 +89,20 @@ static char * number(char * str, int num, int base, int size, int precision
 	return str;
 }
 
-int vsprintf(char *buf, const char *fmt, va_list args)
-{
+int vsprintf(char *buf, const char *fmt, va_list args) {
+
 	int len;
 	int i;
 	char * str;
 	char *s;
 	int *ip;
 
-	int flags;		/* flags to number() */
+	int flags;		// flags to number()
 
-	int field_width;	/* width of output field */
-	int precision;		/* min. # of digits for integers; max
-				   number of chars for from string */
-	int qualifier;		/* 'h', 'l', or 'L' for integer fields */
+	int field_width;	// width of output field
+	int precision;		// min. # of digits for integers; max
+				        // number of chars for from string
+	int qualifier;		// 'h', 'l', or 'L' for integer fields
 
 	for (str=buf ; *fmt ; ++fmt) {
 		if (*fmt != '%') {
@@ -106,10 +110,10 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 			continue;
 		}
 			
-		/* process flags */
+		// process flags
 		flags = 0;
 		repeat:
-			++fmt;		/* this also skips first '%' */
+			++fmt;		// this also skips first '%'
 			switch (*fmt) {
 				case '-': flags |= LEFT; goto repeat;
 				case '+': flags |= PLUS; goto repeat;
@@ -118,12 +122,12 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 				case '0': flags |= ZEROPAD; goto repeat;
 				}
 		
-		/* get field width */
+		// get field width
 		field_width = -1;
 		if (is_digit(*fmt))
 			field_width = skip_atoi(&fmt);
 		else if (*fmt == '*') {
-			/* it's the next argument */
+			// it's the next argument
 			field_width = va_arg(args, int);
 			if (field_width < 0) {
 				field_width = -field_width;
@@ -131,21 +135,21 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 			}
 		}
 
-		/* get the precision */
+		// get the precision
 		precision = -1;
 		if (*fmt == '.') {
 			++fmt;	
 			if (is_digit(*fmt))
 				precision = skip_atoi(&fmt);
 			else if (*fmt == '*') {
-				/* it's the next argument */
+				// it's the next argument
 				precision = va_arg(args, int);
 			}
 			if (precision < 0)
 				precision = 0;
 		}
 
-		/* get the conversion qualifier */
+		// get the conversion qualifier
 		qualifier = -1;
 		if (*fmt == 'h' || *fmt == 'l' || *fmt == 'L') {
 			qualifier = *fmt;
@@ -226,6 +230,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 	}
 	*str = '\0';
 	return str-buf;
+
 }
 
 
