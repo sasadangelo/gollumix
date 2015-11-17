@@ -1,1 +1,1 @@
-Read the kernel code from disk and copy it in 0x1000:0. Jump to the setup code.
+Move the kernel from 0x10000 to 0x01000.

@@ -142,7 +142,7 @@ ok_load_setup:
     movw    $SYSSEG, %ax
     movw    %ax, %es
     call read_it
-    call kill_motor         # stop the floppy motor
+	call kill_motor         # stop the floppy motor
 
 # Basically in the memory there is the following situation:
 #
@@ -369,7 +369,7 @@ read_track:
     pushw   %cx
     pushw   %bx
     pushw   %ax
-    int     $0x13
+    int $0x13
     jc  bad_rt
 
     addw    $8, %sp             # 4 registers have been put on the stack.
@@ -382,7 +382,7 @@ bad_rt:
     call    print_all           # dump registers
     xorb    %ah, %ah            # %ah = 0
     xorb    %dl, %dl            # %dl = 0
-    int     $0x13               # reset FDC
+    int $0x13                   # reset FDC
     addw    $10, %sp            # 4 registers + 1 error code have been put
                                 # on the stack. Discard them.
     popa                        # Recover the registers.
