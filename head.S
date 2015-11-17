@@ -1,3 +1,5 @@
+INIT_STACK = 0x94000-0x0C
+
 .text
 .global idt
 
@@ -7,13 +9,15 @@ stext:
 
 startup_32:
 	cld
-	movl    $0x10,%eax		# DS = ES = FS = GS = SS = entry 0x10 in GDT 
-                            # containing reference to data segment
-	mov     %ax,%ds
-	mov     %ax,%es
-    mov     %ax,%fs
+	movl    $0x10,%eax		# DS = ES = FS = GS = entry 0x10 in GDT containing
+	movw    %ax,%ds         # reference to data segment
+	movw    %ax,%es
     movw    %ax,%ss
-    mov     %ax,%gs
+
+    movw    %ax,%fs
+    movw    %ax,%gs
+
+    movl    $INIT_STACK, %esp
     call    setup_idt
     call    start_kernel
 

@@ -1,7 +1,6 @@
 #include "io.h"
 #include "system.h"
-
-unsigned char *vid_mem = (unsigned char *)(0xb8000);
+#include "kernel.h"
 
 extern void kb_intr(void);
 
@@ -9,34 +8,7 @@ extern void kb_intr(void);
  * the keyboard interrupt handler. Here it prints a simple "Hello" message.
  */
 void keyboard_interrupt(void) {
-    *vid_mem++ = 'H';
-    *vid_mem++ = 0x6;
-    *vid_mem++ = 'e';
-    *vid_mem++ = 0x6;
-    *vid_mem++ = 'l';
-    *vid_mem++ = 0x6;
-    *vid_mem++ = 'l';
-    *vid_mem++ = 0x6;
-    *vid_mem++ = 'o';
-    *vid_mem++ = 0x6;
-    *vid_mem++ = ' ';
-    *vid_mem++ = 0x6;
-    *vid_mem++ = 'K';
-    *vid_mem++ = 0x6;
-    *vid_mem++ = 'e';
-    *vid_mem++ = 0x6;
-    *vid_mem++ = 'y';
-    *vid_mem++ = 0x6;
-    *vid_mem++ = 'b';
-    *vid_mem++ = 0x6;
-	*vid_mem++ = 'o';
-	*vid_mem++ = 0x6;
-	*vid_mem++ = 'a';
-    *vid_mem++ = 0x6;
-	*vid_mem++ = 'r';
-    *vid_mem++ = 0x6;
-	*vid_mem++ = 'd';
-	*vid_mem++ = 0x6;
+	printk("Hello Keyboard\n");
 }
 
 /*

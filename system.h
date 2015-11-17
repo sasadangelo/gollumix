@@ -1,6 +1,12 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
+#define save_flags(x) \
+    __asm__ __volatile__("pushfl ; popl %0":"=g" (x): /* no input */)
+
+#define restore_flags(x) \
+    __asm__ __volatile__("pushl %0 ; popfl": :"g" (x):"memory", "cc")
+
 #define sti() __asm__ ("sti"::)
 #define cli() __asm__ ("cli"::)
 
