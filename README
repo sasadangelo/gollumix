@@ -1,1 +1,1 @@
-Add the routine kill_motor to our code to stop the floppy motor after the read.
+Load the setup code at the location 0x9000:0x0200 = 0x9020:0
