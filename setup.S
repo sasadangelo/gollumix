@@ -153,7 +153,12 @@ end_move:
     call    delay
 
     movb    $0xfb, %al      # Command OCW1. (out[0x21] = 0xFB, Slave).
-    outb    %al, $0x21      # Mask all interrupt except IRQ2 
+    outb    %al, $0x21      # Mask all interrupt except IRQ2
+
+# Switch in Protected mode setting the bit 0 of the Machine Status Word (MSW)
+    movw    $0x0001, %ax
+    lmsw    %ax
+    call    delay
 
 done:
 	jmp done
