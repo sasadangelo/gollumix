@@ -1,2 +1,5 @@
-Add the support for SHIFT key. Pressing SHIFT-key letter an upper case letter
-is displayed.
+Add the support for:
+
+- ALT key
+- ALTGR key
+- extended scan code

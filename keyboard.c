@@ -5,10 +5,15 @@
 
 #define LSHIFT   0x01
 #define RSHIFT   0x02
+#define LCTRL    0x04
+#define RCTRL    0x08
+#define ALT      0x10
+#define ALTGR    0x20
 
 typedef void (*fptr)(int);
 
 unsigned char kmode   = 0;
+unsigned char ke0     = 0;
 
 static fptr key_table[];
 
@@ -26,7 +31,14 @@ void keyboard_interrupt(void) {
     outb_p(x&0x7f, 0x61);
     outb(0x20, 0x20);
 
-	key_table[scancode](scancode);
+    if (scancode == 0xE0) {
+        ke0 = 1;
+    } else if (scancode == 0xE1) {
+        ke0 = 2;
+    } else {
+        key_table[scancode](scancode);
+        ke0 = 0;
+    }
 }
 
 /*
@@ -53,15 +65,36 @@ static void none(int sc) {
 static void do_self(int sc) {
 	unsigned char ch;
 
-    if (kmode & (LSHIFT|RSHIFT)) {
-	    ch=shift_map[sc];
-	} else {
+    if (kmode & ALTGR) {
+	    ch=alt_map[sc];
+    } else if (kmode & (LSHIFT|RSHIFT|LCTRL|RCTRL)) {
+        ch=shift_map[sc];
+    } else {
         ch=key_map[sc];
-	}
+    }
 
 	if (ch == 0) {
 		return;
 	}
+
+    // If CTRL is active the character CTRL-A == 0x01, CTRL-B == 0x02,
+    // CTRL-Z == 0x1A.
+    if (kmode & (LCTRL|RCTRL)) {
+        if ((ch>='a' && ch <='z') || (ch>=224 && ch<=254)) {
+            ch -= 32;
+        }
+    }
+
+    if (kmode & (LCTRL|RCTRL)) {
+        ch &= 0x1f;
+    }
+
+    // If the character has been pressed in combination with
+    // ALT key, the bit 7 is activated. For LATIN-1 map the character is
+    // prepended with 0x33 value (now not handled).
+    if (kmode & ALT) {
+        ch |= 0x80;
+    }
 
 	printk("%c", ch);
 }
@@ -70,9 +103,19 @@ static void enter(int sc) {
 }
 
 static void ctrl(int sc) {
+    if (ke0) {
+        kmode|=RCTRL;
+    } else {
+        kmode|=LCTRL;
+    }
 }
 
 static void unctrl(int sc) {
+    if (ke0) {
+        kmode&=(~RCTRL);
+    } else {
+        kmode&=(~LCTRL);
+    }
 }
 
 static void lshift(int sc) {
@@ -87,20 +130,30 @@ static void slash(int sc) {
 }
 
 static void rshift(int sc) {
-	kmode|=RSHIFT;
+    kmode|=RSHIFT;
 }
 
 static void unrshift(int sc) {
-	kmode&=(~RSHIFT);
+    kmode&=(~RSHIFT);
 }
 
 static void star(int sc) {
 }
 
 static void alt(int sc) {
+    if (ke0) {
+        kmode|=ALTGR;
+    } else {
+        kmode|=ALT;
+    }
 }
 
 static void unalt(int sc) {
+    if (ke0) {
+        kmode&=(~ALTGR);
+    } else {
+        kmode&=(~ALT);
+    }
 }
 
 static void caps(int sc) {
