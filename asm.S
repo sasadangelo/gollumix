@@ -11,7 +11,39 @@
 .extern unhand_int
 .extern IRQ_TABLE
 
-CS_RFS = 0x2C
+/*
+ * Stack layout in ret_from_syscall:
+ *
+ *   0(%esp) - %ebx
+ *   4(%esp) - %ecx
+ *   8(%esp) - %edx
+ *   C(%esp) - %esi
+ *  10(%esp) - %edi
+ *  14(%esp) - %ebp
+ *  18(%esp) - %eax
+ *  1C(%esp) - %ds
+ *  20(%esp) - %es
+ *  24(%esp) - %eip
+ *  28(%esp) - %cs
+ *  2C(%esp) - %eflags
+ *  30(%esp) - %oldesp
+ *  34(%esp) - %oldss
+ */
+
+EBX             = 0x00
+ECX             = 0x04
+EDX             = 0x08
+ESI             = 0x0C
+EDI             = 0x10
+EBP             = 0x14
+EAX             = 0x18
+DS              = 0x1C
+ES              = 0x20
+EIP             = 0x24
+CS              = 0x28
+EFLAGS          = 0x2C
+OLDESP          = 0x30
+OLDSS           = 0x34
 
 /* Current process info: */
 .extern current
@@ -27,34 +59,60 @@ ENTRY(need_schedule) .byte 0
  */
 #define SAVE_ALL	\
 	cld;			\
-	pusha;			\
-	pushl	%ds;		\
-	pushl	%es;		\
-	pushl	%fs;		\
-	pushl	%gs;		\
-	movw	$KERNEL_DS,%si;	\
-	movw	%si,%ds;	\
-	movw	%si,%es;	\
-    movw    $USER_DS,%si; \
-    movw    %si,%fs; \
-	pushl	$ret_from_intr
+    pushl   %es; \
+    pushl   %ds; \
+    pushl   %eax; \
+    pushl   %ebp; \
+    pushl   %edi; \
+    pushl   %esi; \
+    pushl   %edx; \
+    pushl   %ecx; \
+    pushl   %ebx; \
+    movl    $KERNEL_DS,%edx; \
+    movl    %edx,%ds; \
+    movl    %edx,%es; \
+    movl    $USER_DS,%edx; \
+    movl    %edx, %fs;
+
+#define RESTORE_ALL \
+    popl %ebx;  \
+    popl %ecx;  \
+    popl %edx;  \
+    popl %esi;  \
+    popl %edi;  \
+    popl %ebp;  \
+    popl %eax;  \
+    popl %ds;   \
+    popl %es;   \
+    iret;
+
+.extern sys_call_table
+.extern schedule
+ENTRY(system_call)  /* int 0x80: EAX: call_num, parameters in EBX/ECX/EDX */
+    SAVE_ALL
+    STI     /* interrupts enabled during a system call */
+
+    cmpl    $NR_SYSCALLS, %eax    /* exist? */
+    jae ret_from_syscall
+    call    *sys_call_table(,%eax,4)
+    movl    %eax, EAX(%esp)         /* get from the stack the return code */
 
 /*
- * The routine used to return from an interrupt. The keyboard_interrupt
- * is a C routine so it return with a RET instruction. An interrupt handler must
- * return with IRET, so this routine is necessary.
+ * The routine used to return from a sys call or interrupt. An interrupt at the
+ * difference of a normal routine must return with an IRET instruction (see
+ * RESTORE_ALL).
  */
-ret_from_intr:
+ENTRY(ret_from_syscall)
     CLI                      /* NO INTERRUPT! */
 
-    movl current, %eax       /* if current == NULL call the scheduler */
-    cmpl $0, %eax
-    je   0f
+    movl current, %ebx       /* if current == NULL call the scheduler */
+    cmpl  $0, %ebx
+    je  0f
 
-    cmpl $0, STATE(%eax)     /* if the process is not running, schedule */
+    cmpl  $0, STATE(%ebx)    /* if the process is not running, schedule */
     jne  0f
 
-    cmpw $(KERNEL_CS), CS_RFS(%esp) 
+    cmpw    $(KERNEL_CS), CS(%esp) 
                              /* if the process is in kernel mode do not sched */
     je  1f
 
@@ -64,36 +122,12 @@ ret_from_intr:
 0:
     call schedule
 1:
-    popl %gs
-    popl %fs
-    popl %es
-    popl %ds
-    popa
-
-    IRET
-
-.extern sys_call_table
-ENTRY(system_call)  /* int 0x80: EAX: call_num, parameters in EBX/ECX/EDX */
-    SAVE_ALL
-    STI     /* interrupts enabled during a system call */
-
-    cmpl    $NR_SYSCALLS-1, %eax    /* exist? */
-    ja  1f
-
-    /* parametri = ebx, ecx, edx */
-    pushl   %edx
-    pushl   %ecx
-    pushl   %ebx
-
-    call    *sys_call_table(,%eax,4)
-    addl    $3*4, %esp
-1:
-    RET
+    RESTORE_ALL
 
 ENTRY(_unhand_int)
     SAVE_ALL
     call    unhand_int  /* il codice C provvede... */
-    RET
+    jmp ret_from_syscall
 
 INT_CTL     = 0x20
 INT_CTLMASK = 0x21
@@ -115,9 +149,10 @@ ENABLE      = 0x20
     inb $INT_CTLMASK, %al;  \
     andb    $~(1<<irq), %al;    \
     outb    %al, $INT_CTLMASK;  \
-    RET             /* Get the address of the ret_from_intr
-                     * routine from the stack.
-                     */
+    jmp ret_from_syscall;          
+                                   /* Get the address of the ret_from_intr
+									* routine from the stack.
+									*/
 
 #define HWINT_SLAVE(irq) \
     ENTRY(_hwint##irq)      \
@@ -135,15 +170,14 @@ ENABLE      = 0x20
     inb $INT2_CTLMASK, %al; \
     andb    $~(1<<(irq-8)), %al;    \
     outb    %al, $INT2_CTLMASK; \
-    RET
+    jmp ret_from_syscall;
 
 ENTRY(_hwint0)      /* timer handler: do not enable interrupt */
     SAVE_ALL
     call    *(IRQ_TABLE)    /* element 0 */
     movb    $ENABLE, %al
     outb    %al, $INT_CTL
-
-    RET
+    jmp ret_from_syscall;
 
 HWINT_MASTER(1)
 HWINT_MASTER(2)

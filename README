@@ -1,22 +1,9 @@
-Add the support for system call fork. In this step the fork is able to fork 
-only the idle process (in fact no copy occurs). In the next step we will
-modify the routine to support the fork of whatever process.
+In this step an improvement is done in the stack layout when a sys call is
+called. This will improve also the signature of the sys_fork routine.
 
 Files modified:
 ---------------
 asm.S
-errno.h (new)
-kernel.lds.S
-fork.c (new)
-main.c
-Makefile
-sched.h
-sched.c
-string.h
+fork.c
 sys.c
-sys.h
-time.c
-types.h (new)
-unistd.h
-segment.h
-system.h
+build.c (only formatting changes have been applied on this file)

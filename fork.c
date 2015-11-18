@@ -4,6 +4,7 @@
 #include "stddef.h"
 #include "errno.h"
 #include "segment.h"
+#include "ptrace.h"
 
 int find_empty_process(void) {
     int nr;
@@ -14,12 +15,7 @@ int find_empty_process(void) {
     return -EAGAIN;
 }
 
-asmlinkage int sys_fork(long ebx,   long ecx,   long edx,    long ret,
-                        long gs,    long fs,    long es,     long ds,
-                        long edi,   long esi,   long ebp,    long __esp, 
-                        long __ebx, long __edx, long __ecx,  long eax,
-                        long eip,   long cs,    long eflags, long esp,
-                        long ss) {
+asmlinkage int sys_fork(struct pt_regs regs) {
     struct task_struct *tsk;
     int nr;
     long flags;
@@ -58,23 +54,23 @@ asmlinkage int sys_fork(long ebx,   long ecx,   long edx,    long ret,
     tsk->tss.ss2 = 0;
     tsk->tss.cr3 = 0;
 
-    tsk->tss.eip = eip;
-    tsk->tss.eflags = eflags;
+    tsk->tss.eip = regs.eip;
+    tsk->tss.eflags = regs.eflags;
 
     tsk->tss.eax = 0;
-    tsk->tss.ecx = ecx;
-    tsk->tss.edx = edx;
-    tsk->tss.ebx = ebx;
+    tsk->tss.ecx = regs.ecx;
+    tsk->tss.edx = regs.edx;
+    tsk->tss.ebx = regs.ebx;
 
-    tsk->tss.esp = esp;
-    tsk->tss.ebp = ebp;
-    tsk->tss.esi = esi;
-    tsk->tss.edi = edi;
+    tsk->tss.esp = regs.esp;
+    tsk->tss.ebp = regs.ebp;
+    tsk->tss.esi = regs.esi;
+    tsk->tss.edi = regs.edi;
 
-    tsk->tss.es = es & 0xffff;
-    tsk->tss.cs = cs & 0xffff;
-    tsk->tss.ss = ss & 0xffff;
-    tsk->tss.ds = ds & 0xffff;
+    tsk->tss.es = regs.xes & 0xffff;
+    tsk->tss.cs = regs.xcs & 0xffff;
+    tsk->tss.ss = regs.xss & 0xffff;
+    tsk->tss.ds = regs.xds & 0xffff;
 
     // it is not necessary set FS and GS
 
@@ -91,10 +87,10 @@ asmlinkage int sys_fork(long ebx,   long ecx,   long edx,    long ret,
     return nr;
 
 fork_no_mem:
-        restore_flags(flags);
-	    return -ENOMEM;
+    restore_flags(flags);
+    return -ENOMEM;
 fork_no_entry:
-	    restore_flags(flags);
-	    return -EAGAIN;
+    restore_flags(flags);
+    return -EAGAIN;
 }
 

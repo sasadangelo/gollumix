@@ -8,12 +8,13 @@
 #include "kernel.h"
 #include "sys.h"
 #include "unistd.h"
+#include "ptrace.h"
 
 /*
  * For this step only this system call is supported for debug purpose.
  */
 extern asmlinkage int sys_print(char *msg);
-extern asmlinkage int sys_fork(void);
+extern asmlinkage int sys_fork(struct pt_regs regs);
 
 /*
  * The system call table
