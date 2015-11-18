@@ -1,40 +1,11 @@
-Here we add the support for simple memory management. Basically we define
-two kernel apis:
+Here we reload the GDT allocating the space for NR_TASKS couple of TSS and 
+DT. Each process in the GDT will have a TSS and LDT associated.
 
-	get_free_page
-	free_page
-
-to allocate and deallocate phisical memory pages.
-This is the map of our memory:
-
-    ------------
-   |////////////|
-   |____________|
-   |            | 0x01000 Start Kernel 
-   |            |
-   |   Kernel   |
-   |            |
-   |            |
-   |            |
-   |____________| KEND (we defined an arbitrary upper limit for kernel mm)
-   |  page 0    | Start Memory for processes
-   |____________|
-   |  page 1    |
-   |____________|
-   |            | we reserved 63 pages for processes memory
-   |            | (63 is an arbitrary e temporarly value)
-   |   ......   |
-   |____________|
-   | page 63    |
-   |____________|
+We check that our terminal still work with this new GDT.
 
 Files modified:
---------------- 
-kernel.h
-kernel_map.h (new)
-main.c
+---------------
+head.S
 Makefile
-mm.c (new)
-mm.h (new)
-panic.c (new)
-stddef.h
+segment.h (new)
+tasks (new)
