@@ -9,6 +9,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "keymap.h"
+#include "irq.h"
 
 #define LSHIFT   0x01
 #define RSHIFT   0x02
@@ -76,8 +77,7 @@ void keyboard_init(void) {
     // programming the PIC 8259 Master Controller in order to associate IRQ1
     // to the keyboard interrupt handler. Remember the interrupt
     // vector of IRQ1 is 0x21 (see PIC programming in setup.S).
-    set_intr_gate(0x21, &kb_intr);
-    outb_p(inb_p(0x21) & 0xfd, 0x21);
+    add_irq_handler (1, &keyboard_interrupt);
 
     // disable/enable the keyboard
     a=inb_p(0x61);

@@ -4,12 +4,10 @@
  * Copyright (C) 2003 Open Community
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
+#include "linkage.h"
 
-#define ALIGN	.align 16,0x90
-#define ENTRY(name) \
-	.global name; \
-	ALIGN; \
-	name:
+.extern unhand_int
+.extern IRQ_TABLE
 
 /*
  * Save all registers
@@ -27,27 +25,81 @@
 	pushl	$ret_from_intr
 
 /*
- * Entry point for keyboard interrupt handler
- */
-ENTRY(kb_intr)
-	SAVE_ALL	/* salva tutto! */
-	STI
-	call keyboard_interrupt
-	RET         /* take the return address on top of the stack, that contain
-                   ret_from_int take. So this instruction jump to ret_from_intr
-                   routine */
-
-/*
  * The routine used to return from an interrupt. The keyboard_interrupt
  * is a C routine so it return with a RET instruction. An interrupt handler must
  * return with IRET, so this routine is necessary.
  */
 ret_from_intr:
-	CLI		/* NO INTERRUPT! */
-	popw	%gs
-	popw	%fs
-	popw	%es
-	popw	%ds
-	popa
+    CLI     /* NO INTERRUPT! */
+    popw    %gs
+    popw    %fs
+    popw    %es
+    popw    %ds
+    popa
 
-	IRET
+    IRET
+
+ENTRY(_unhand_int)
+    SAVE_ALL
+    call    unhand_int  /* il codice C provvede... */
+    RET
+
+INT_CTL     = 0x20
+INT_CTLMASK = 0x21
+INT2_CTL    = 0xA0
+INT2_CTLMASK    = 0xA1
+ENABLE      = 0x20
+
+#define HWINT_MASTER(irq) \
+    ENTRY(_hwint##irq)      \
+    SAVE_ALL;           \
+    inb $INT_CTLMASK, %al;  \
+    orb $1<<irq, %al;       \
+    outb    %al, $INT_CTLMASK;  \
+    movb    $ENABLE, %al;       \
+    outb    %al, $INT_CTL;      \
+    STI;                \
+    call    *(IRQ_TABLE+4*irq); \
+    CLI;                \
+    inb $INT_CTLMASK, %al;  \
+    andb    $~(1<<irq), %al;    \
+    outb    %al, $INT_CTLMASK;  \
+    RET             /* Get the address of the ret_from_intr
+                     * routine from the stack.
+                     */
+
+#define HWINT_SLAVE(irq) \
+    ENTRY(_hwint##irq)      \
+    SAVE_ALL;           \
+    inb $INT2_CTLMASK, %al; \
+    orb $1<<(irq-8), %al;   \
+    outb    %al, $INT2_CTLMASK; \
+    movb    $ENABLE, %al;       \
+    outb    %al, $INT_CTL;      \
+    jmp .+2;            \
+    outb    %al, $INT2_CTL;     \
+    STI;                \
+    call    *(IRQ_TABLE+4*irq); \
+    CLI;                \
+    inb $INT2_CTLMASK, %al; \
+    andb    $~(1<<(irq-8)), %al;    \
+    outb    %al, $INT2_CTLMASK; \
+    RET
+
+HWINT_MASTER(0)
+HWINT_MASTER(1)
+HWINT_MASTER(2)
+HWINT_MASTER(3)
+HWINT_MASTER(4)
+HWINT_MASTER(5)
+HWINT_MASTER(6)
+HWINT_MASTER(7)
+
+HWINT_SLAVE(8)
+HWINT_SLAVE(9)
+HWINT_SLAVE(10)
+HWINT_SLAVE(11)
+HWINT_SLAVE(12)
+HWINT_SLAVE(13)
+HWINT_SLAVE(14)
+HWINT_SLAVE(15)

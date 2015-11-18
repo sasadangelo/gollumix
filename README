@@ -1,9 +1,16 @@
 Here we want to add a better support for IRQ.
-A new file is added: irq.c. In this step init_irq is defined containing the 
-PIC programming code from setup.S.
+Add a new file traps.c to define the interrupt traps for all IRQs and change
+asm.S to implement a more flexible infrastructure.
+
+With this new infrastructure it will be possible associate an handler to an IRQ
+simply using the routine add_irq_handler.
 
 Files modified:
 ---------------
+asm.S
+irq.c
+irq.h (new)
+keyboard.c
+linkage.h (new)
+main.c
 Makefile
-setup.S
-irq.c (new file)

@@ -6,6 +6,9 @@
  */
 
 #include "io.h"
+#include "system.h"
+
+#define is_valid_irq(n) (n>=0 && n<16)
 
 #define INT_CTL         0x20
 #define INT_CTLMASK     0x21
@@ -14,6 +17,39 @@
 
 static unsigned char cache_21 = 0xFB;   // IRQ 2 on Master is cascaded
 static unsigned char cache_A1 = 0xFF;
+
+//IRQ handlers added by add_irq_handler
+volatile void *IRQ_TABLE[16];
+
+static void enable_irq(unsigned int irq_nr) {
+    // this routine is called by add_irq_handler, so irq_nr
+    // is in the range [0 .. 15]. 
+    // save_flags(flags); cli(); ... restore_flags(flags) have already
+    // been called.
+    // unsigned long flags;
+    unsigned char mask;
+
+    mask = ~(1 << (irq_nr & 7));
+    if (irq_nr < 8) {
+        cache_21 &= mask;
+        outb(cache_21,0x21);
+    } else {
+        // here 8 <= irq_nr < 16
+        cache_A1 &= mask;
+        outb(cache_A1,0xA1);
+    }
+}
+
+void add_irq_handler(unsigned int irq_nr, void *handler) {
+    long flags;
+
+    save_flags(flags); cli();
+    if (is_valid_irq(irq_nr)) {
+        IRQ_TABLE[irq_nr] = handler;
+        enable_irq(irq_nr);
+    }
+    restore_flags(flags);
+}
 
 void init_irq(void) {
     outb(0xff, INT_CTLMASK);      // OCW1 command. Mask all the IRQ on Master

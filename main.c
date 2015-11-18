@@ -9,6 +9,7 @@
 #include "system.h"
 #include "kernel.h"
 
+extern void init_traps(void);
 extern void init_irq(void);
 
 /*
@@ -16,6 +17,8 @@ extern void init_irq(void);
  * function is called.
  */
 void start_kernel(void) {
+    // init traps
+    init_traps();
     // initialize IRQs
     init_irq();
 
