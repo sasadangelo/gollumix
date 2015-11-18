@@ -1,12 +1,12 @@
-Add the timer interrupt handler. This handler is activated each ms to
-increment the variable jiffies.
-
-A dot is print at each tick of the clock.
+Improvement of the timer driver.
+The current date and time is printed at boot time. 
 
 Files modified:
 ---------------
-asm.S
-main.c
 Makefile
-sched.h (new)
-time.c (new)
+mc146818rtc.h (new)
+mktime.c (new)
+mktime.h (new)
+sched.c (new)
+time.c
+time.h (new)

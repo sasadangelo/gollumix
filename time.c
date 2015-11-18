@@ -9,6 +9,11 @@
 #include "io.h"
 #include "irq.h"
 #include "sched.h"
+#include "mktime.h"
+#include "mc146818rtc.h"
+#include "time.h"
+
+#define RTC_ALWAYS_BCD 1
 
 #define TIMER_COUNT ((unsigned) (TIMER_FREQ/HZ))
 #define TIMER_FREQ  1193182L
@@ -17,11 +22,14 @@
 #define TIMER_0     0x40    /* timer channel 0 */
 #define SQUARE_WAVE 0x36
 
+extern struct timeval xtime;
+
 unsigned long volatile jiffies = 0;
+
+extern long kernel_mktime(struct mktime * time);
 
 static void timer_interrupt(void) {
     ++jiffies;
-    printk(".");
 }
 
 static void setup_timer(void) {
@@ -35,5 +43,38 @@ static void setup_timer(void) {
 }
 
 void time_init(void) {
-	setup_timer();
+	struct mktime time;
+    
+	do {  
+        // Isn't this overkill ? UIP above should guarantee consistency 
+        time.sec  = CMOS_READ(RTC_SECONDS);
+        time.min  = CMOS_READ(RTC_MINUTES);
+        time.hour = CMOS_READ(RTC_HOURS);
+        time.day  = CMOS_READ(RTC_DAY_OF_MONTH);
+        time.mon  = CMOS_READ(RTC_MONTH);
+        time.year = CMOS_READ(RTC_YEAR);
+    } while (time.sec != CMOS_READ(RTC_SECONDS));
+
+	if (!(CMOS_READ(RTC_CONTROL) & RTC_DM_BINARY) || RTC_ALWAYS_BCD) {
+        BCD_TO_BIN(time.sec);
+        BCD_TO_BIN(time.min);
+        BCD_TO_BIN(time.hour);
+        BCD_TO_BIN(time.day);
+        BCD_TO_BIN(time.mon);
+        BCD_TO_BIN(time.year);
+    }
+
+    // print the current date and time
+    printk("Date (mm/dd/yy): %02d/%02d/%02d\n",
+			time.mon, 
+			time.day, 
+			time.year);
+    printk("Time (hh:mm:ss): %02d:%02d:%02d\n",
+			time.hour,
+			time.min,
+			time.sec);
+
+    xtime.tv_sec = kernel_mktime(&time);
+
+    setup_timer();
 }
