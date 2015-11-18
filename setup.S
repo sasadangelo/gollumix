@@ -135,37 +135,7 @@ end_move:
     call    delay
 
 # PIC programming
-    movb    $0x11, %al      # Comando ICW1 (out[0x20] = 0x11, Master). ICW4
-    outb    %al, $0x20      # will be sent and size of entry in interrupt
-    call    delay           # vector is 4 bytes.
-
-    outb    %al, $0xa0      # Comando ICW1. (out[0xA0] = 0x11, Slave). ICW4
-    call    delay           # will be sent and size of entry in interrupt
-                            # vector is 4 bytes.
-
-    movb    $0x20, %al      # Comando ICW2. (out[0x21] = 0x20, Master).
-    outb    %al, $0x21      # IRQ0 -> 20h, IRQ1 -> 21h, and so on
-    call    delay
-
-    movb    $0x28, %al      # Comando ICW2. (out[0xA1] = 0x28, Slave).
-    outb    %al, $0xa1      # IRQ8 -> 28h, IRQ9 -> 29h, and so on
-    call    delay
-
-    movb    $0x04, %al      # Command ICW3. The controller master is attached to
-    outb    %al, $0x21      # the slave through IRQ12 (IRQ4 on slave).
-    call    delay
-
-
-    movb    $0x02, %al      # Command ICW3. The controller slave is attached to
-    outb    %al, $0xa1      # the master through IRQ2
-    call    delay
-
-    movb    $0x01, %al      # Command ICW4. (out[0x21] = 0x01, Master).
-    outb    %al, $0x21
-    call    delay
-
-    outb    %al, $0xa1      # Command ICW4. (out[0xA1] = 0x01, Slave).
-    call    delay
+# Here we mask all the interrupts (OCW1 command) the rest is done in initIRQ().
 
     movb    $0xff, %al      # Command OCW1. (out[0xA1] = 0xFF, Master).
     outb    %al, $0xa1      # mask all interrupt for controller Slave

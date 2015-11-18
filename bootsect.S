@@ -1,3 +1,10 @@
+/*
+ * bootsect.S
+ *
+ * Copyright (C) 2003 Open Community
+ * author Salvatore D'Angelo (koala.gnu@tiscali.it)
+ */
+
 SETUPSECTS = 4
 BOOTSEG    = 0x07C0
 INITSEG    = 0x9000

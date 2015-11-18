@@ -1,3 +1,10 @@
+/*
+ * kernel.h
+ *
+ * Copyright (C) 2003 Open Community
+ * author Salvatore D'Angelo (koala.gnu@tiscali.it)
+ */
+
 #ifndef KERNEL_H
 #define KERNEL_H
 

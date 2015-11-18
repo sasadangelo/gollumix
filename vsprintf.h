@@ -1,3 +1,10 @@
+/*
+ * vsprintf.h
+ *
+ * Copyright (C) 2003 Open Community
+ * author Salvatore D'Angelo (koala.gnu@tiscali.it)
+ */
+
 #ifndef VSPRINTF_H
 #define VSPRINTF_H
 

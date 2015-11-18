@@ -1,3 +1,10 @@
+/*
+ * asm.S
+ *
+ * Copyright (C) 2003 Open Community
+ * author Salvatore D'Angelo (koala.gnu@tiscali.it)
+ */
+
 #define ALIGN	.align 16,0x90
 #define ENTRY(name) \
 	.global name; \

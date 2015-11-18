@@ -7,7 +7,7 @@ CPP=gcc -E
 #KEYBOARD = -DKBD_US
 KEYBOARD = -DKBD_IT
 
-KERNEL_OBJ=head.o main.o tty_io.o keyboard.o console.o asm.o vsprintf.o
+KERNEL_OBJ=head.o main.o tty_io.o keyboard.o console.o asm.o vsprintf.o irq.o
 
 all: image
 

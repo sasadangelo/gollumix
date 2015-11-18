@@ -1,3 +1,10 @@
+/*
+ * head.S
+ *
+ * Copyright (C) 2003 Open Community
+ * author Salvatore D'Angelo (koala.gnu@tiscali.it)
+ */
+
 INIT_STACK = 0x94000-0x0C
 
 .text

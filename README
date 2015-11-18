@@ -1,1 +1,9 @@
-Add the support for 4 consoles and use ALT-Fn k to switch to the k console.
+Here we want to add a better support for IRQ.
+A new file is added: irq.c. In this step init_irq is defined containing the 
+PIC programming code from setup.S.
+
+Files modified:
+---------------
+Makefile
+setup.S
+irq.c (new file)

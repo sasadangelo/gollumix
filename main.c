@@ -9,11 +9,16 @@
 #include "system.h"
 #include "kernel.h"
 
+extern void init_irq(void);
+
 /*
  * This is the kernel main routine. When the boot process is completed, this
  * function is called.
  */
 void start_kernel(void) {
+    // initialize IRQs
+    init_irq();
+
     // initialize the tty driver. The tty is composed by a keyboard driver
     // that read input keys a print the relative ASCII code on video.
     tty_init();
