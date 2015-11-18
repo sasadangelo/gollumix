@@ -9,6 +9,11 @@
 #include "system.h"
 #include "kernel.h"
 #include "kernel_map.h"
+#include "sched.h"
+#include "unistd.h"
+
+_syscall1(int, print, char*, msg)
+_syscall0(int, fork)
 
 extern void init_traps(void);
 extern void init_irq(void);
@@ -21,6 +26,8 @@ extern void sched_init(void);
  * function is called.
  */
 void start_kernel(void) {
+    int pid;
+
     // init traps
     init_traps();
     // initialize IRQs
@@ -34,13 +41,26 @@ void start_kernel(void) {
     // initialize the scheduler
     sched_init();
 
-    printk("Kernel Info: %u bytes, start at %x end at %x\n", 
+    printk("Kernel info: %u bytes, start at %x end at %x\n",
            K_SIZE, K_START, K_END);
 
     sti();
 
     // switch in user mode
     move_to_user_mode();
+
+    pid = fork();
+
+    if (pid == 0) {
+        print("idle task child is running.\n");
+        while(1);
+    } else if (pid < 0) {
+        print("idle: cannot duplicate myself.\n");
+    }
+
+    // this message will not be printed since the child process will be always
+    // up and running, so there is no chance for idle process to be scheduled.
+    print("idle task is running.\n");
 
     // idle loop
     while(1);

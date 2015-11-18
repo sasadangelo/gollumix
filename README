@@ -1,16 +1,22 @@
-New feature:
-
-- move in user mode
-- adding LD script to map the kernel memory
+Add the support for system call fork. In this step the fork is able to fork 
+only the idle process (in fact no copy occurs). In the next step we will
+modify the routine to support the fork of whatever process.
 
 Files modified:
 ---------------
-bootsect.S
-config.h (new)
-kernel.lds.S (new)
-kernel_map.h (new)
+asm.S
+errno.h (new)
+kernel.lds.S
+fork.c (new)
 main.c
 Makefile
+sched.h
+sched.c
+string.h
+sys.c
+sys.h
+time.c
+types.h (new)
+unistd.h
 segment.h
 system.h
-sched.c

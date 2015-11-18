@@ -35,8 +35,8 @@ ENTRY(need_schedule) .byte 0
 	movw	$KERNEL_DS,%si;	\
 	movw	%si,%ds;	\
 	movw	%si,%es;	\
-	movw    $USER_DS,%si; \
-	movw    %si,%fs; \
+    movw    $USER_DS,%si; \
+    movw    %si,%fs; \
 	pushl	$ret_from_intr
 
 /*

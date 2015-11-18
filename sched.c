@@ -5,10 +5,16 @@
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
 
+#include "types.h"
+#include "stddef.h"
 #include "time.h"
 #include "sched.h"
 #include "mm.h"
 #include "kernel.h"
+#include "string.h"
+#include "kernel_map.h"
+
+#define is_valid_task(pid) ((pid)>0 && (pid)<NR_TASKS && task[pid])
 
 volatile struct timeval xtime;
 
@@ -73,7 +79,7 @@ asmlinkage void schedule(void) {
 
         // Loop through the process table
         for(p = &LAST_TASK; p > &FIRST_TASK; --p) {
-            // for avalid entry, re calculate the counter field.
+            // for a valid entry, re calculate the counter field.
             if (*p) {
                 (*p)->counter = ((*p)->counter>>1) + (*p)->priority;
             }
@@ -83,8 +89,8 @@ asmlinkage void schedule(void) {
     // reset the need_schedule variable
     need_schedule = 0;
 
-    // switch to the next task ... in the next step will be implemented
-    // switch_to(task[next]);
+    // switch to the next task
+    switch_to(task[next]);
 }
 
 /*

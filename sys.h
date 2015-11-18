@@ -8,6 +8,6 @@
 #ifndef SYS_H
 #define SYS_H
 
-#define NR_SYSCALLS 1
+#define NR_SYSCALLS 2
 
 #endif

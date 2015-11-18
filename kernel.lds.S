@@ -18,6 +18,7 @@ SECTIONS
     .data : { *(.bss) *(COMMON) }
     _BSS_END_ = .;
 
+    __KERNEL_REAL_END__ = .;
     . = ALIGN(4096);
     __KERNEL_END__ = .;
 }

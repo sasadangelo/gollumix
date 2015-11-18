@@ -10,6 +10,7 @@
 #include "io.h"
 #include "kernel.h"
 #include "string.h"
+#include "uaccess.h"
 
 #define N_CONSOLES   4
 #define MEM_VIDEO   0xb8000
@@ -206,8 +207,16 @@ void switch_to_console(int n) {
 /*
  * A simple implementation of a debug system call
  */
-int sys_print(char *msg) {
-    printk(msg);
+asmlinkage int sys_print(char *msg) {
+    char ch;
+    long flags;
+
+    save_flags(flags); cli();
+    while ( (ch=get_fs_byte(msg)) ) {
+        print_char (ch);
+        msg++;
+    }
+    restore_flags(flags);
     return 0;
 }
 

@@ -76,4 +76,30 @@ __asm__ ("movw %%dx,%%ax\n\t" \
 #define set_ldt_desc(n,addr,size) \
     _set_tssldt_desc(((char *) (n)),((int)(addr)),((size << 3) - 1),"0x82")
 
+extern inline void
+set_code_desc(void *_desc, unsigned long base, unsigned long limit) {
+    long *desc = (long*)_desc;
+
+    *(desc+1) = (base & 0xff000000) |
+                ((base & 0x00ff0000)>>16) |
+                (limit & 0x000f0000) |
+                (0x0040FA00);
+
+    *(desc) = ((base & 0x0000ffff)<<16) |
+                (limit & 0x0000ffff);
+}
+
+extern inline void
+set_data_desc(void *_desc, unsigned long base, unsigned long limit) {
+    long *desc = (long*)_desc;
+
+    *(desc+1) = (base & 0xff000000) |
+                ((base & 0x00ff0000)>>16) |
+                (limit & 0x000f0000) |
+                (0x0040F200);
+
+    *(desc) = ((base & 0x0000ffff)<<16) |
+                (limit & 0x0000ffff);
+}
+
 #endif
