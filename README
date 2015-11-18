@@ -6,8 +6,6 @@ Files modified:
 errno.h
 exec.c (new)
 Makefile
-proc_1.c (new)
+proc_1.c
 vfs.h (new)
 tools/build.c
-system.h
-kernel_map.h

@@ -5,6 +5,8 @@
 #include "errno.h"
 #include "segment.h"
 #include "ptrace.h"
+#include "types.h"
+#include "string.h"
 
 int find_empty_process(void) {
     int nr;
@@ -42,6 +44,27 @@ asmlinkage int sys_fork(struct pt_regs regs) {
     *tsk = *current;
     tsk->pid = nr;
     tsk->counter = tsk->priority;
+
+    // if we are forking the idle process, we assume its child will call an
+    // exec just after the fork. In this case we do not duplicate code/data.
+    // If we are forking whatever process, so it is necessary allocate a
+    // page for it (containing code and data) e setup its LDT to the new
+    // address space
+    if (current->pid != 0) {
+        // allocate memory for code/data
+        tsk->mem = (char *) get_free_page();
+
+        if (!tsk->mem) {
+            goto fork_data_no_mem;
+        }
+
+        // copy process data
+        memcpy(tsk->mem, current->mem, PAGE_SIZE);
+
+        // set up LDT
+        set_code_desc(&(tsk->ldt[1]), (u_long) tsk->mem, PAGE_SIZE-1);
+        set_data_desc(&(tsk->ldt[2]), (u_long) tsk->mem, PAGE_SIZE-1);
+    }
 
     // setup TSS
     tsk->tss.back_link = 0;
@@ -86,6 +109,8 @@ asmlinkage int sys_fork(struct pt_regs regs) {
     restore_flags(flags);
     return nr;
 
+fork_data_no_mem:
+    free_page(tsk);
 fork_no_mem:
     restore_flags(flags);
     return -ENOMEM;
