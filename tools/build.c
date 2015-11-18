@@ -22,6 +22,7 @@
 #include <stdarg.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include "../vfs.h"
 
 typedef unsigned char byte;
 typedef unsigned short word;
@@ -53,18 +54,26 @@ void file_open(const char *name)
 
 void usage(void)
 {
-    die("Usage: build bootsect setup system [> image]");
+    die("Usage: build bootsect setup system N proc1 ... procN [> image]");
 }
 
 int main(int argc, char ** argv)
 {
     unsigned int i, c, sz, setup_sectors;
-    u32 sys_size;
+    unsigned int num_procs, size_header;
     byte major_root, minor_root;
+    u32 sys_size, size_procs;
     struct stat sb;
+    byte *buffer;
+    int n;
 
-    if (argc != 4)
+    // The VFS structure used for our hardcoded processes
+    struct vfs_header *vfs_h;
+
+    if (argc < 5)
         usage();
+
+    num_procs = atoi(argv[4]);
 
     major_root = DEFAULT_MAJOR_ROOT;
     minor_root = DEFAULT_MINOR_ROOT;
@@ -112,11 +121,11 @@ int main(int argc, char ** argv)
         die("Unable to stat `%s': %m", argv[3]);
     sz = sb.st_size;
     fprintf (stderr, "System is %d kB\n", sz/1024);
-    sys_size = (sz + 15) / 16;
+    sys_size = sz;
 	// 0x28000*16 = 2.5 MB, conservative estimate for the current maximum
-    if (sys_size > DEF_SYSSIZE)
+    if (((sys_size + 15) / 16) > DEF_SYSSIZE)
         die("System is too big"); 
-    if (sys_size > 0xefff)
+    if (((sys_size + 15) / 16) > 0xefff)
         fprintf(stderr,"warning: kernel is too big for standalone boot "
                        "from floppy\n");
     while (sz > 0) {
@@ -134,6 +143,53 @@ int main(int argc, char ** argv)
         sz -= l;
     }
     close(fd);
+
+    // ----------------------------------------------------------------------
+    // Here I assume the procs are very small, so they could be included in
+    // the buffer.
+    size_header = sizeof(struct vfs_header) + 
+                  num_procs * sizeof(struct node_struct);
+
+    sys_size += size_header;
+
+    buffer = buf;
+    vfs_h = (struct vfs_header*) buf;
+    vfs_h->n_files = num_procs;
+    buffer += size_header;
+    size_procs = size_header;
+
+    for (i = 0; i<num_procs; ++i) {
+        file_open(argv[5+i]);
+        if (fstat (fd, &sb)) {
+            die("Unable to stat `%s': %m", argv[5+i]);
+        }
+        sz = sb.st_size;
+        size_procs += sz;
+        sys_size += sz;
+        vfs_h->node[i].size = sz;
+        sprintf(vfs_h->node[i].name, "PRG%d", i+1);
+
+        if ((n=read(fd, buffer, sz)) != sz) {
+            if (n < 0)
+                die("Error reading %s: %m", argv[5+i]);
+            else
+                die("%s: Unexpected EOF", argv[5+i]);
+        }
+
+        buffer += sz;
+
+        close(fd);
+
+        fprintf(stderr, "Added process: %s, size: %d\n", 
+                        vfs_h->node[i].name,
+                        vfs_h->node[i].size);
+    }
+
+    // write buf on stdout
+    write(1, buf, size_procs);
+
+    // convert sys_size in 16 byte clicks.
+    sys_size = (sys_size + 15) / 16;
 
     if (lseek(1, 507, SEEK_SET) != 507) // Write sizes to the bootsector
         die("Output: seek failed");

@@ -1,9 +1,13 @@
-In this step an improvement is done in the stack layout when a sys call is
-called. This will improve also the signature of the sys_fork routine.
+In this step we add the system call exec. After the forking of idle process,
+its child should execute a shell program. In this step we try to do this.
 
 Files modified:
 ---------------
-asm.S
-fork.c
-sys.c
-build.c (only formatting changes have been applied on this file)
+errno.h
+exec.c (new)
+Makefile
+proc_1.c (new)
+vfs.h (new)
+tools/build.c
+system.h
+kernel_map.h

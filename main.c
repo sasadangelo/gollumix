@@ -14,6 +14,7 @@
 
 _syscall1(int, print, char*, msg)
 _syscall0(int, fork)
+_syscall1(int, exec, char*, name)
 
 extern void init_traps(void);
 extern void init_irq(void);
@@ -52,8 +53,7 @@ void start_kernel(void) {
     pid = fork();
 
     if (pid == 0) {
-        print("idle task child is running.\n");
-        while(1);
+        exec("PRG1");
     } else if (pid < 0) {
         print("idle: cannot duplicate myself.\n");
     }

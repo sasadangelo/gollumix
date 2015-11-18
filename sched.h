@@ -59,6 +59,7 @@ struct task_struct {
     long priority;   // static priority
 
     int pid;         // the process id
+    char *mem;       // each process has only one page for code/data.
     struct desc_struct ldt[3];  // local descriptor table of the process
                                 // 0:null
                                 // 1:CS
@@ -74,6 +75,7 @@ struct task_struct {
     {TASK_RUNNING, \
      15, \
      15, \
+     0,  \
      0,  \
      {{0, 0}, \
       {0x9f, 0xc0fa00}, \

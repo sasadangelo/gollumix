@@ -11,6 +11,7 @@
 // the syscall index in the syscall table.
 #define __NR_print  0
 #define __NR_fork   1
+#define __NR_exec   2
 
 #define _syscall0(type,name) \
 extern inline type name(void) \
@@ -43,5 +44,6 @@ extern int errno;
 // the signature of the supported system call
 int print(char *msg);
 int fork(void);
+int exec(char *filename);
 
 #endif

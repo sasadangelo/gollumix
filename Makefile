@@ -13,7 +13,7 @@ DEBUG =
 KEYBOARD = -DKBD_IT
 
 KERNEL_OBJ=head.o main.o tty_io.o keyboard.o console.o asm.o vsprintf.o irq.o \
-	traps.o time.o mktime.o sched.o sys.o mm.o panic.o errno.o fork.o
+	traps.o time.o mktime.o sched.o sys.o mm.o panic.o errno.o fork.o exec.o
 
 all: image
 
@@ -50,12 +50,15 @@ asm.o: asm.S
 disk: image
 	dd if=image of=/dev/fd0 bs=512
 
-image: kernel bootsect setup ./tools/build
-	./tools/build bootsect setup kernel > image
+image: kernel bootsect setup ./tools/build proc_1.bin
+	./tools/build bootsect setup kernel 1 proc_1.bin > image
 
 ./tools/build: ./tools/build.c
 	$(CC) -o ./tools/build ./tools/build.c
 
+%.bin: %.o errno.o syscall.o
+	$(LD) -T proc.lds -o $@ $< errno.o syscall.o
+
 clean:
-	rm -f *.o *.s kernel.lds
+	rm -f *.o *.s kernel.lds *.bin
 	rm -rf bootsect setup kernel image ./tools/build

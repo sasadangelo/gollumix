@@ -16,8 +16,8 @@
 #define restore_flags(x) \
     __asm__ __volatile__("pushl %0 ; popfl": :"g" (x):"memory", "cc")
 
-#define sti() __asm__ ("sti"::)
-#define cli() __asm__ ("cli"::)
+#define sti() __asm__ ("sti": : :"memory")
+#define cli() __asm__ ("cli": : :"memory")
 
 #define move_to_user_mode() \
 __asm__ __volatile__ ("movl %%esp,%%eax\n\t" \
