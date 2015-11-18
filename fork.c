@@ -21,6 +21,7 @@ asmlinkage int sys_fork(struct pt_regs regs) {
     struct task_struct *tsk;
     int nr;
     long flags;
+    unsigned long used_memory = 0;
 
     save_flags(flags); cli();
 
@@ -52,18 +53,21 @@ asmlinkage int sys_fork(struct pt_regs regs) {
     // address space
     if (current->pid != 0) {
         // allocate memory for code/data
-        tsk->mem = (char *) get_free_page();
+        tsk->mem = (char *) get_free_pages(current->used_pages);
 
         if (!tsk->mem) {
             goto fork_data_no_mem;
         }
 
+        // total memory used by current process
+        used_memory = current->used_pages * PAGE_SIZE;
+
         // copy process data
-        memcpy(tsk->mem, current->mem, PAGE_SIZE);
+        memcpy(tsk->mem, current->mem, used_memory);
 
         // set up LDT
-        set_code_desc(&(tsk->ldt[1]), (u_long) tsk->mem, PAGE_SIZE-1);
-        set_data_desc(&(tsk->ldt[2]), (u_long) tsk->mem, PAGE_SIZE-1);
+        set_code_desc(&(tsk->ldt[1]), (u_long) tsk->mem, used_memory);
+        set_data_desc(&(tsk->ldt[2]), (u_long) tsk->mem, used_memory);
     }
 
     // setup TSS

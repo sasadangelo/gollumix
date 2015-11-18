@@ -11,7 +11,7 @@
 #include "stddef.h"
 
 #define BITS_PER_BYTE 8
-#define MEM_INIT	  K_END
+#define MEM_INIT      K_END
 #define NR_PAGES	  64
 #define MAP_SIZE	  ((NR_PAGES+BITS_PER_BYTE-1)/BITS_PER_BYTE)
 
@@ -126,3 +126,85 @@ void free_page(void* page) {
 bad_page:
     panic("mm: trying to free bad page!");
 }
+
+/*
+ * This routine allocate num physical pages contigous.
+ */
+void* get_free_pages(unsigned int num) {
+    unsigned int i, j, found, last_page;
+
+    if (num == 0) {
+        panic("get_free_pages (mm.c): bad request");
+    }
+
+    // look through a bitmap to find an empty page. We are using a first fit
+    // logic.
+    for (i=0; i<NR_PAGES; i++) {
+        // try to allocate the block from page i and page i+num
+        found = 1;
+        last_page = i+num-1;
+
+        // if there is not sufficient room an out of memory error will occur
+        if (last_page > NR_PAGES-1) {
+            break;
+        }
+
+        // check if the pages from i to i+num are free
+        for (j=i; j<=last_page; ++j) {
+            if (get_bit(j) == 1) {
+                // the block [i, last_page] is not completely free, try a
+                // next block
+                found = 0;
+                break;
+            }
+        }
+
+        // the block of the pages in the range [i, i+num] are all free. Allocate
+        // them
+        if (found) {
+            for (j=i; j<=last_page; ++j) {
+                set_bit(j);
+            }
+
+#ifdef DEBUG
+            printk("mm: page allocated [%d, %d]\n", i, last_page);
+            print_bitmap();
+#endif
+            return (void*)(MEM_INIT + i*PAGE_SIZE);
+        }
+    }
+
+    panic("mm: out of memory\n");
+    return NULL;
+}
+
+void free_pages(void* page, unsigned int nr) {
+    unsigned long addr = (unsigned long)page;
+    unsigned int i, last_page;
+
+    // check if we are freeing a bad page
+    if (addr < MEM_INIT)
+        goto bad_page;
+    addr -= MEM_INIT;
+    if (addr%PAGE_SIZE)
+        goto bad_page;
+    addr /= PAGE_SIZE;
+    last_page = addr + nr;
+    if (last_page >= NR_PAGES)
+        goto bad_page;
+
+    for(i=addr; i<last_page; ++i) {
+        clear_bit(i);
+    }
+
+#ifdef DEBUG
+    printk("mm: pages freed [%d - %d]\n", addr, last_page);
+    print_bitmap();
+#endif
+
+    return;
+
+bad_page:
+    panic("Trying to free a bad block!");
+}
+

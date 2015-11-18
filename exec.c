@@ -22,16 +22,14 @@ struct file_info {
 };
 
 static int exec_proc(struct file_info *file, struct pt_regs *regs) {
+    unsigned long required_pages, used_memory;
     char *prg_mem;
 
-    // 1/3 is for stack!
-    if (file->size > PAGE_SIZE*2/3) {
-        printk ("process too big!");
-        return -ENOMEM;
-    }
+    required_pages = ((file->size + USER_STACK_SIZE) + PAGE_SIZE -1)/PAGE_SIZE;
+    used_memory = required_pages * PAGE_SIZE;
 
     // allocate a page for code/data/stack
-    prg_mem = (char *) get_free_page();
+    prg_mem = (char *) get_free_pages(required_pages);
 
     // if there is no memory available exit immediately
     if (!prg_mem) {
@@ -40,18 +38,19 @@ static int exec_proc(struct file_info *file, struct pt_regs *regs) {
 
     // free the process page if possible.
     if (current->mem) {
-        free_page(current->mem);
+        free_pages(current->mem, required_pages);
     }
 
     // clean memory and copy process code/data
-    memset(prg_mem, 0, PAGE_SIZE-1);
-    memcpy(prg_mem, file->ptr, PAGE_SIZE-1);
+    memset(prg_mem, 0, used_memory);
+    memcpy(prg_mem, file->ptr, file->size);
 
 	current->mem = prg_mem;
+	current->used_pages = required_pages;
 
     // set up LDT
-    set_code_desc(&(current->ldt[1]), (u_long) current->mem, PAGE_SIZE-1);
-    set_data_desc(&(current->ldt[2]), (u_long) current->mem, PAGE_SIZE-1);
+    set_code_desc(&(current->ldt[1]), (u_long) current->mem, used_memory-1);
+    set_data_desc(&(current->ldt[2]), (u_long) current->mem, used_memory-1);
 
     // set up part of TSS
     regs->eip  = 0;
@@ -62,7 +61,7 @@ static int exec_proc(struct file_info *file, struct pt_regs *regs) {
     regs->edx = 0;
     regs->ebx = 0;
 
-    regs->esp = PAGE_SIZE & 0xFFFFFF00;
+    regs->esp = used_memory & 0xFFFFFF00;
     regs->ebp = 0;
     regs->esi = 0;
     regs->edi = 0;

@@ -1,11 +1,10 @@
-In this step we add the system call exec. After the forking of idle process,
-its child should execute a shell program. In this step we try to do this.
+In this step we remove the limitation of processes having only one page for
+code and data.
 
 Files modified:
 ---------------
-errno.h
-exec.c (new)
-Makefile
-proc_1.c
-vfs.h (new)
-tools/build.c
+sched.h
+fork.c
+exec.c
+mm.c
+mm.h
