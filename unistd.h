@@ -12,14 +12,14 @@
 #define __NR_print  0
 
 #define _syscall1(type,name,atype,a) \
-type name(atype a) \
+extern inline type name(atype a) \
 { \
 type __res; \
 __asm__ volatile ("int $0x80" \
 	: "=a" (__res) \
     : "0" (__NR_##name),"b" (a)); \
     if (__res >= 0) \
-        return __res; \
+	    return __res; \
     errno = -__res; \
     return -1; \
 }

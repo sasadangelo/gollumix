@@ -4,8 +4,8 @@ CC=gcc
 CPP=gcc -E
 
 #Select one of these two option if you want compile in debug or not debug mode
-DEBUG =
-#DEBUG = -DDEBUG
+#DEBUG =
+DEBUG = -DDEBUG
 
 # Please select your keyboard map
 #KEYBOARD = -DKBD_US

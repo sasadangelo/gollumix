@@ -6,9 +6,21 @@
  */
 #include "linkage.h"
 #include "sys.h"
+#include "segment.h"
 
 .extern unhand_int
 .extern IRQ_TABLE
+
+CS_RFS = 0x2C
+
+/* Current process info: */
+.extern current
+STATE = 0
+COUNTER = 4
+PRIORITY = 8
+
+/* This variable indicate if the scheduler must be called */
+ENTRY(need_schedule) .byte 0
 
 /*
  * Save all registers
@@ -16,13 +28,15 @@
 #define SAVE_ALL	\
 	cld;			\
 	pusha;			\
-	pushw	%ds;		\
-	pushw	%es;		\
-	pushw	%fs;		\
-	pushw	%gs;		\
-	movw	$0x10,%si;	\
+	pushl	%ds;		\
+	pushl	%es;		\
+	pushl	%fs;		\
+	pushl	%gs;		\
+	movw	$KERNEL_DS,%si;	\
 	movw	%si,%ds;	\
 	movw	%si,%es;	\
+	movw    $USER_DS,%si; \
+	movw    %si,%fs; \
 	pushl	$ret_from_intr
 
 /*
@@ -31,11 +45,29 @@
  * return with IRET, so this routine is necessary.
  */
 ret_from_intr:
-    CLI     /* NO INTERRUPT! */
-    popw    %gs
-    popw    %fs
-    popw    %es
-    popw    %ds
+    CLI                      /* NO INTERRUPT! */
+
+    movl current, %eax       /* if current == NULL call the scheduler */
+    cmpl $0, %eax
+    je   0f
+
+    cmpl $0, STATE(%eax)     /* if the process is not running, schedule */
+    jne  0f
+
+    cmpw $(KERNEL_CS), CS_RFS(%esp) 
+                             /* if the process is in kernel mode do not sched */
+    je  1f
+
+    cmpb $0, need_schedule   /* if it is not necessary to schedule */
+    je  1f
+
+0:
+    call schedule
+1:
+    popl %gs
+    popl %fs
+    popl %es
+    popl %ds
     popa
 
     IRET

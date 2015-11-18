@@ -13,6 +13,7 @@ extern void init_traps(void);
 extern void init_irq(void);
 
 extern void time_init(void);
+extern void sched_init(void);
 
 /*
  * This is the kernel main routine. When the boot process is completed, this
@@ -29,6 +30,8 @@ void start_kernel(void) {
     tty_init();
     // initialize the timer.
     time_init();
+    // initialize the scheduler
+    sched_init();
     sti();
 
     // idle loop
