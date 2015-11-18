@@ -9,16 +9,30 @@
 #include "system.h"
 #include "kernel.h"
 
-#ifdef DEBUG
-#include "unistd.h"
-
-_syscall1(int, print, char*, msg);
-#endif
-
 extern void init_traps(void);
 extern void init_irq(void);
 
 extern void time_init(void);
+
+#ifdef DEBUG
+#define NUM_PAGES 3
+#include "mm.h"
+
+static void test_mm(void) {
+    int i;
+    char *address[NUM_PAGES];
+
+    // allocate 3 pages
+    for (i=0; i<NUM_PAGES; ++i) {
+       address[i] = get_free_page();
+    }
+
+    // free the pages previously allocated
+    for (i=0; i<NUM_PAGES; ++i) {
+       free_page(address[i]);
+    }
+}
+#endif
 
 /*
  * This is the kernel main routine. When the boot process is completed, this
@@ -38,10 +52,10 @@ void start_kernel(void) {
     sti();
 
 #ifdef DEBUG
-    // test system call infrastructure
-    print("System call: ok!\n");
+    // test memory management
+    test_mm();
 #endif
-
+    
     // idle loop
     while(1);
 }

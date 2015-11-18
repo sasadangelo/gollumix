@@ -18,10 +18,10 @@ type __res; \
 __asm__ volatile ("int $0x80" \
 	: "=a" (__res) \
     : "0" (__NR_##name),"b" (a)); \
-if (__res >= 0) \
-	return __res; \
-	errno = -__res; \
-	return -1; \
+    if (__res >= 0) \
+        return __res; \
+    errno = -__res; \
+    return -1; \
 }
 
 extern int errno;

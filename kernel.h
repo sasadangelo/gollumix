@@ -11,5 +11,6 @@
 #define asmlinkage	__attribute__((regparm(0)))
 
 asmlinkage int printk(const char * fmt, ...);
+asmlinkage void panic(char *msgerr);
 
 #endif

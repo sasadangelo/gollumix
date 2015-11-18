@@ -4,15 +4,15 @@ CC=gcc
 CPP=gcc -E
 
 #Select one of these two option if you want compile in debug or not debug mode
-#DEBUG=
-DEBUG=-DDEBUG
+#DEBUG =
+DEBUG = -DDEBUG
 
 # Please select your keyboard map
 #KEYBOARD = -DKBD_US
 KEYBOARD = -DKBD_IT
 
 KERNEL_OBJ=head.o main.o tty_io.o keyboard.o console.o asm.o vsprintf.o irq.o \
-	traps.o time.o mktime.o sched.o sys.o errno.o
+	traps.o time.o mktime.o sched.o sys.o errno.o mm.o panic.o
 
 all: image
 

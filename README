@@ -1,14 +1,40 @@
-In this step we add the support for the system calls.
+Here we add the support for simple memory management. Basically we define
+two kernel apis:
+
+	get_free_page
+	free_page
+
+to allocate and deallocate phisical memory pages.
+This is the map of our memory:
+
+    ------------
+   |////////////|
+   |____________|
+   |            | 0x01000 Start Kernel 
+   |            |
+   |   Kernel   |
+   |            |
+   |            |
+   |            |
+   |____________| KEND (we defined an arbitrary upper limit for kernel mm)
+   |  page 0    | Start Memory for processes
+   |____________|
+   |  page 1    |
+   |____________|
+   |            | we reserved 63 pages for processes memory
+   |            | (63 is an arbitrary e temporarly value)
+   |   ......   |
+   |____________|
+   | page 63    |
+   |____________|
 
 Files modified:
----------------
-asm.S
-console.c
-errno.c (new)
+--------------- 
+kernel.h
+kernel_map.h (new)
 main.c
 Makefile
-sys.c (new)
-sys.h (new)
-system.h
-traps.c
-unistd.h (new)
+mm.c (new)
+mm.h (new)
+panic.c (new)
+stddef.h
