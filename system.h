@@ -8,6 +8,8 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
+#include "segment.h"
+
 #define save_flags(x) \
     __asm__ __volatile__("pushfl ; popl %0":"=g" (x): /* no input */)
 
@@ -16,6 +18,21 @@
 
 #define sti() __asm__ ("sti"::)
 #define cli() __asm__ ("cli"::)
+
+#define move_to_user_mode() \
+__asm__ __volatile__ ("movl %%esp,%%eax\n\t" \
+    "pushl %0\n\t" \
+    "pushl %%eax\n\t" \
+    "pushfl\n\t" \
+    "pushl %1\n\t" \
+    "pushl $1f\n\t" \
+    "iret\n" \
+    "1:\tmovl %0,%%eax\n\t" \
+    "mov %%ax,%%ds\n\t" \
+    "mov %%ax,%%es\n\t" \
+    "mov %%ax,%%fs\n\t" \
+    "mov %%ax,%%gs" \
+    : /* no outputs */ :"i" (USER_DS), "i" (USER_CS):"%eax")
 
 typedef struct desc_struct {
     unsigned long a, b;

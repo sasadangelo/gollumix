@@ -8,6 +8,7 @@
 #include "tty.h"
 #include "system.h"
 #include "kernel.h"
+#include "kernel_map.h"
 
 extern void init_traps(void);
 extern void init_irq(void);
@@ -32,7 +33,14 @@ void start_kernel(void) {
     time_init();
     // initialize the scheduler
     sched_init();
+
+    printk("Kernel Info: %u bytes, start at %x end at %x\n", 
+           K_SIZE, K_START, K_END);
+
     sti();
+
+    // switch in user mode
+    move_to_user_mode();
 
     // idle loop
     while(1);

@@ -1,20 +1,16 @@
-Now we add the following functions:
+New feature:
 
-- process table
-- only one process (the idle task) -> the current task
-- the timer tick decrement the dynamic priority of the current process and
-  when it is equal to 0 the need_schedule variable is set to 1.
-- each time we return from interrupt and need_schedule == 1, the schedule is
-  called.
-- Now the schedule reschedules always the idle task, but its dynamic priority
-  will be not updated, so at each clock tick the scheduler is called to check
-  if there is an available task to run.
+- move in user mode
+- adding LD script to map the kernel memory
 
 Files modified:
 ---------------
-asm.S
+bootsect.S
+config.h (new)
+kernel.lds.S (new)
+kernel_map.h (new)
+main.c
 Makefile
-sched.h
-sched.c
+segment.h
 system.h
-time.c
+sched.c

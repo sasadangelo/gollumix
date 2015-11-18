@@ -5,12 +5,14 @@
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
 
+#include "config.h"
+
 SETUPSECTS = 4
 BOOTSEG    = 0x07C0
-INITSEG    = 0x9000
-SETUPSEG   = 0x9020
-SYSSEG     = 0x1000
-SYSSIZE    = 0x7F00             # This value is put in the syssize variable
+INITSEG    = DEF_INITSEG
+SETUPSEG   = DEF_SETUPSEG
+SYSSEG     = DEF_SYSSEG
+SYSSIZE    = DEF_SYSSIZE        # This value is put in the syssize variable
                                 # (see below). The value reported here is a
                                 # dummy value, it will be replaced by the
                                 # build.c utility. Please see the code in

@@ -32,17 +32,9 @@ static void timer_interrupt(void) {
     ++jiffies;
 
     if ((--current->counter)>0) {
-#ifdef DEBUG
-        printk("The current process has priority %d\n", current->counter);
-#endif
         // the current task must continue to run
         return;
     }
-
-#ifdef DEBUG
-    printk("Time slice expired, he current task should be scheduled\n");
-    delay();
-#endif
 
     // the current task must be scheduled
     current->counter = 0;

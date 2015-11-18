@@ -9,7 +9,6 @@
 #include "sched.h"
 #include "mm.h"
 #include "kernel.h"
-#include "segment.h"
 
 volatile struct timeval xtime;
 
@@ -38,11 +37,6 @@ asmlinkage void schedule(void) {
                        // table
     int c;             // the dynamic priority of the task e are analyzing
     struct task_struct **p; // the process table
-
-#ifdef DEBUG
-    printk("The scheduler is called\n");
-    delay();
-#endif
 
     while(1) {
         c = -1;
@@ -104,12 +98,3 @@ void sched_init(void) {
     ltr(0);
     lldt(0);
 }
-
-#ifdef DEBUG
-void delay() {
-    int i;
-
-    for (i=0; i<1000000; ++i) {
-    }
-}
-#endif

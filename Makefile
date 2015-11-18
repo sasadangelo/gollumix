@@ -2,10 +2,11 @@ AS=as
 LD=ld 
 CC=gcc
 CPP=gcc -E
+LDS= kernel.lds
 
 #Select one of these two option if you want compile in debug or not debug mode
-#DEBUG =
-DEBUG = -DDEBUG
+DEBUG =
+#DEBUG = -DDEBUG
 
 # Please select your keyboard map
 #KEYBOARD = -DKBD_US
@@ -22,7 +23,7 @@ bootsect: bootsect.o
 bootsect.o: bootsect.s
 	$(AS) -o $@ $<
 
-bootsect.s: bootsect.S
+%.s: %.S
 	$(CPP) -traditional $< -o $@
 
 setup: setup.o
@@ -31,17 +32,14 @@ setup: setup.o
 setup.o: setup.s
 	$(AS) -o $@ $<
 
-setup.s: setup.S
-	$(CPP) -traditional $< -o $@
+kernel: $(KERNEL_OBJ) $(LDS)
+	$(LD) -e stext -T $(LDS) -s --oformat binary $(KERNEL_OBJ) -o $@
 
-kernel: $(KERNEL_OBJ)
-	$(LD) -e stext -Ttext 0x1000 -s --oformat binary $(KERNEL_OBJ) -o $@
+$(LDS):
+	$(CPP) -nostdinc -P -C -Ui386 -o $@ $@.S
 
 head.o: head.s
 	$(AS) -o $@ $<
-
-head.s: head.S
-	$(CPP) -traditional $< -o $@
 
 .c.o:
 	$(CC) $(KEYBOARD) $(DEBUG) -I. -nostdinc -Wall -O -fomit-frame-pointer -c $< -o  $@
@@ -59,5 +57,5 @@ image: kernel bootsect setup ./tools/build
 	$(CC) -o ./tools/build ./tools/build.c
 
 clean:
-	rm -f *.o *.s
+	rm -f *.o *.s kernel.lds
 	rm -rf bootsect setup kernel image ./tools/build
