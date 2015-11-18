@@ -202,3 +202,12 @@ void switch_to_console(int n) {
         restore_flags(flags);
     }
 }
+
+/*
+ * A simple implementation of a debug system call
+ */
+int sys_print(char *msg) {
+    printk(msg);
+    return 0;
+}
+

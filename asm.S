@@ -5,6 +5,7 @@
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
 #include "linkage.h"
+#include "sys.h"
 
 .extern unhand_int
 .extern IRQ_TABLE
@@ -38,6 +39,24 @@ ret_from_intr:
     popa
 
     IRET
+
+.extern sys_call_table
+ENTRY(system_call)  /* int 0x80: EAX: call_num, parameters in EBX/ECX/EDX */
+    SAVE_ALL
+    STI     /* interrupts enabled during a system call */
+
+    cmpl    $NR_SYSCALLS-1, %eax    /* exist? */
+    ja  1f
+
+    /* parametri = ebx, ecx, edx */
+    pushl   %edx
+    pushl   %ecx
+    pushl   %ebx
+
+    call    *sys_call_table(,%eax,4)
+    addl    $3*4, %esp
+1:
+    RET
 
 ENTRY(_unhand_int)
     SAVE_ALL

@@ -31,6 +31,8 @@ extern void _hwint13(void);
 extern void _hwint14(void);
 extern void _hwint15(void);
 
+extern void system_call(void);
+
 void unhand_int(void) {
     printk("\nInterrupt with no handler!\n");
     while(1);
@@ -60,7 +62,12 @@ void init_traps(void) {
     set_intr_gate(0x2E, &_hwint14);
     set_intr_gate(0x2F, &_hwint15);
 
-    // system call: 0x80. Not implemented yet
-    for (i=0x30; i<IDT_ELEMENTS; i++)
+    for (i=0x30; i<0x7F; i++)
+        set_intr_gate(i, &_unhand_int);
+
+    // handle system call using interrupt 0x80
+    set_system_gate(0x80, &system_call);
+
+    for (i=0x81; i<IDT_ELEMENTS; i++)
         set_intr_gate(i, &_unhand_int);
 }

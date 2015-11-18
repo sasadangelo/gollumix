@@ -1,12 +1,14 @@
-Improvement of the timer driver.
-The current date and time is printed at boot time. 
+In this step we add the support for the system calls.
 
 Files modified:
 ---------------
+asm.S
+console.c
+errno.c (new)
+main.c
 Makefile
-mc146818rtc.h (new)
-mktime.c (new)
-mktime.h (new)
-sched.c (new)
-time.c
-time.h (new)
+sys.c (new)
+sys.h (new)
+system.h
+traps.c
+unistd.h (new)

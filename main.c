@@ -9,6 +9,12 @@
 #include "system.h"
 #include "kernel.h"
 
+#ifdef DEBUG
+#include "unistd.h"
+
+_syscall1(int, print, char*, msg);
+#endif
+
 extern void init_traps(void);
 extern void init_irq(void);
 
@@ -30,6 +36,11 @@ void start_kernel(void) {
     // initialize the timer.
     time_init();
     sti();
+
+#ifdef DEBUG
+    // test system call infrastructure
+    print("System call: ok!\n");
+#endif
 
     // idle loop
     while(1);
