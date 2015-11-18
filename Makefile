@@ -8,7 +8,7 @@ CPP=gcc -E
 KEYBOARD = -DKBD_IT
 
 KERNEL_OBJ=head.o main.o tty_io.o keyboard.o console.o asm.o vsprintf.o irq.o \
-	traps.o
+	traps.o time.o
 
 all: image
 

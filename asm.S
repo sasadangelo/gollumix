@@ -86,7 +86,14 @@ ENABLE      = 0x20
     outb    %al, $INT2_CTLMASK; \
     RET
 
-HWINT_MASTER(0)
+ENTRY(_hwint0)      /* timer handler: do not enable interrupt */
+    SAVE_ALL
+    call    *(IRQ_TABLE)    /* element 0 */
+    movb    $ENABLE, %al
+    outb    %al, $INT_CTL
+
+    RET
+
 HWINT_MASTER(1)
 HWINT_MASTER(2)
 HWINT_MASTER(3)

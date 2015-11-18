@@ -12,6 +12,8 @@
 extern void init_traps(void);
 extern void init_irq(void);
 
+extern void time_init(void);
+
 /*
  * This is the kernel main routine. When the boot process is completed, this
  * function is called.
@@ -25,7 +27,10 @@ void start_kernel(void) {
     // initialize the tty driver. The tty is composed by a keyboard driver
     // that read input keys a print the relative ASCII code on video.
     tty_init();
+    // initialize the timer.
+    time_init();
     sti();
+
     // idle loop
     while(1);
 }

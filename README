@@ -1,16 +1,12 @@
-Here we want to add a better support for IRQ.
-Add a new file traps.c to define the interrupt traps for all IRQs and change
-asm.S to implement a more flexible infrastructure.
+Add the timer interrupt handler. This handler is activated each ms to
+increment the variable jiffies.
 
-With this new infrastructure it will be possible associate an handler to an IRQ
-simply using the routine add_irq_handler.
+A dot is print at each tick of the clock.
 
 Files modified:
 ---------------
 asm.S
-irq.c
-irq.h (new)
-keyboard.c
-linkage.h (new)
 main.c
 Makefile
+sched.h (new)
+time.c (new)
