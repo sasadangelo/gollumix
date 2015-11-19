@@ -1,10 +1,21 @@
-In this step a reorganization of exec code is done. The copy of the program
-name from user space is done with a new strncpy_from_user routine.
-The same routine is used to semplify the implementation of syscall print.
+In this step a check is performed to detect the COM1 serial line.
+If it is present a relative message is displayed.
 
-Files modified:
----------------
-exec.c
-uaccess.h
-usercopy.c (new)
-console.c
+In this step I added a simple script tool/changes.sh that prints all the
+files changed from a previous step.
+
+For example suppose you have two directory with two differents level of code:
+
+step(X) and step(X+1)
+
+cd in step(X+1) and type:
+
+tools/changes.sh <path>step(X)
+
+the list of files changed will appear.
+
+Files changed
+-------------
+serial.c (new)
+serial.h (new)
+tty_io.c

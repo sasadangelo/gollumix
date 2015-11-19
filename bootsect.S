@@ -128,7 +128,7 @@ ok_load_setup:
 #   |   (12 bytes)  |
 #   |_______________| <- 0x9000:0x4000
 #
-# 0x4000 is an arbitrary value >= bootsect size +
+# the address 0x4000 is an arbitrary value >= bootsect size +
 #                                 setup size    +
 #                                 stack size
 
@@ -196,7 +196,7 @@ ok_load_setup:
 #   |   (12 bytes)  |
 #   |_______________| <- 0x9000:0x4000
 #
-# 0x4000 is an arbitrary value >= bootsect size +
+# the address 0x4000 is an arbitrary value >= bootsect size +
 #                               setup size    +
 #                               stack size
 
