@@ -54,6 +54,10 @@ static unsigned int serial_in(struct serial_struct *port, int offset) {
     return inb(port->base + offset);
 }
 
+static unsigned int serial_getchar(struct serial_struct *port) {
+    return serial_in(port, 0); 
+}               
+
 static void wait_for_xmitr(struct serial_struct *port)
 {
     unsigned int status, tmout = 1000000;
@@ -81,7 +85,21 @@ static void serial_outp(unsigned int value, struct serial_struct *port,
 
 // Interrupt Service Routine
 static void rs_interrupt(void) {
-    printk("bytes coming on COM1.");
+    unsigned int c, ch;
+    
+    do {
+        c = serial_in(&rs_table[0], UART_LSR_REG);
+        if (c & 1) {
+            ch = serial_getchar(&rs_table[0]);
+
+            switch(ch) {
+            case 13:
+                break;
+            default:
+                printk("%c", ch);
+            }
+        }
+    } while(c & 1);
 }
 
 // port probing
