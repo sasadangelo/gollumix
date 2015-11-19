@@ -1,1 +1,2 @@
-The characters coming on the serial line are printed on the current screen.
+Use the idle process to consume the characters coming from on the serial
+line.

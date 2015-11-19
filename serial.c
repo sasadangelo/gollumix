@@ -49,6 +49,10 @@ struct serial_struct rs_table[] = {
     { PORT_UNKNOWN,     0, 0x3f8,  4,    0,     0, rs_interrupt }
 };
 
+unsigned int rs_buffer[RS_QUEUE_MAX];
+unsigned int rs_bufferin  = 0;
+unsigned int rs_bufferout = 0;
+
 // get a character from the serial line
 static unsigned int serial_in(struct serial_struct *port, int offset) {
     return inb(port->base + offset);
@@ -92,11 +96,9 @@ static void rs_interrupt(void) {
         if (c & 1) {
             ch = serial_getchar(&rs_table[0]);
 
-            switch(ch) {
-            case 13:
-                break;
-            default:
-                printk("%c", ch);
+            rs_buffer[rs_bufferin++] = ch;
+            if (rs_bufferin == RS_QUEUE_MAX) {
+                rs_bufferin = 0;
             }
         }
     } while(c & 1);

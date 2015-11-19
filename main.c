@@ -11,6 +11,7 @@
 #include "kernel_map.h"
 #include "sched.h"
 #include "unistd.h"
+#include "serial.h"
 
 _syscall1(int, print, char*, msg)
 _syscall0(int, fork)
@@ -21,6 +22,35 @@ extern void init_irq(void);
 
 extern void time_init(void);
 extern void sched_init(void);
+
+extern unsigned int rs_buffer[RS_QUEUE_MAX];
+extern unsigned int rs_bufferin;
+extern unsigned int rs_bufferout;
+
+// active wait on buffer to get data coming from serial line.
+// This method will be removed in next article.
+void rs_loop(void) {
+    unsigned int ch;
+
+    // idle loop
+    while(1) {
+        cli();
+        if (rs_bufferin != rs_bufferout) {
+            ch = rs_buffer[rs_bufferout++];
+            if (rs_bufferout == RS_QUEUE_MAX) {
+                rs_bufferout = 0;
+            }
+
+            switch(ch) {
+            case 13:
+                break;
+            default:
+                printk("%c", ch);
+            }
+        }
+        sti();
+    }
+}
 
 /*
  * This is the kernel main routine. When the boot process is completed, this
@@ -46,6 +76,10 @@ void start_kernel(void) {
            K_SIZE, K_START, K_END);
 
     sti();
+
+    // the idle process consume in kernel mode the characters coming on
+	// serial line. This code will be removed when a real TTY layer is added.
+	rs_loop();
 
     // switch in user mode
     move_to_user_mode();

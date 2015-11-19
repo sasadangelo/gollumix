@@ -1,6 +1,8 @@
 #ifndef SERIAL_H
 #define SERIAL_H
 
+#define RS_QUEUE_MAX    4096
+
 struct serial_struct {
     short type;
     unsigned int minor;
