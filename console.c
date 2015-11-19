@@ -42,12 +42,6 @@ static struct console_struct console[N_CONSOLES+1] = {
 /* Current console: */
 static struct console_struct *cc = &console[1];
 
-//#define VIDEO (cc->video)
-//#define X     (cc->x)
-//#define Y     (cc->y)
-//#define POS   (cc->pos)
-//#define ATTR  (cc->attr)
-
 typedef struct {
     short data[SCR_W];
 } LINE;
@@ -56,9 +50,7 @@ extern void keyboard_init(void);
 
 static void scroll_screen(struct console_struct *con);
 
-/*
- * This routine move the cursor on the position (new_x, new_y).
- */
+// This routine move the cursor on the position (new_x, new_y).
 static inline void gotoxy(struct console_struct *con,
                           unsigned int new_x, 
 						  unsigned int new_y) {
@@ -69,10 +61,8 @@ static inline void gotoxy(struct console_struct *con,
     con->pos=con->video+((con->y*SCR_W+con->x) << 1);
 }
 
-/*
- * This function initializes the console driver. A console is composed by a
- * keyboard and video.
- */
+// This function initializes the console driver. A console is composed by a
+// keyboard and video.
 void con_init(void) {
     unsigned char y = ORIG_Y;
 
@@ -177,7 +167,7 @@ int con_write2(int n, char *buffer, int size) {
     save_flags(flags); cli();
 
     while(i < size) {
-        print_char (&console[n], *(buffer+i));
+        print_char(&console[n], *(buffer+i));
         i++;
     }
 
@@ -194,8 +184,6 @@ int con_write(char *buffer, int size) {
 asmlinkage int printk(const char *fmt, ...) {
     va_list args;
     int len;
-    //char *ch;
-    //long flags;
 
     va_start(args, fmt);
     len = vsprintf(buf,fmt,args);

@@ -15,6 +15,6 @@
 #ifndef SYS_H
 #define SYS_H
 
-#define NR_SYSCALLS 3
+#define NR_SYSCALLS 7
 
 #endif

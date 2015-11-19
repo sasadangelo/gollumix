@@ -125,9 +125,6 @@ static void rs_interrupt(void) {
 // port probing
 static int rs_setup(struct serial_struct *port) {
     int divisor, c, scratch, status1, status2, retval;
-    //struct serial_struct port;
-
-    //port = *port_ptr;
 
     divisor = 115200 / port->speed;
     // turn off interrupt

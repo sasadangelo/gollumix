@@ -14,7 +14,6 @@ struct tty_struct {
 
 // tty routines
 extern void tty_init(void);
-//extern int  get_current_tty_index(void);
 extern void tty_switch(int n);
 
 // current tty

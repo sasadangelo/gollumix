@@ -31,13 +31,6 @@ void tty_init(void) {
     rs_init();
 }
 
-/*
-// return index of current tty
-int get_current_tty_index(void) {
-    return ctty - tty;
-}
-*/
-
 // tty switch
 void tty_switch(int n) {
     long flags;

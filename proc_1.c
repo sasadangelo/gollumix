@@ -9,20 +9,21 @@ void _start(void) {  // offset 0x0
 
 _syscall1(int, print, char*, msg)
 _syscall0(int, fork)
+_syscall1(int, open, const char*, pathname)
+_syscall1(int, close, int, fd)
+_syscall3(ssize_t, read, int, fd, void *, buf, size_t, count)
+_syscall3(ssize_t, write, int, fd, void *, buf, size_t, count)
 
 int main(void) {
-    int pid;
-
-    pid = fork();
-
-    if (pid == 0) {
-        print("PRG1: the process PRG1 child is running\n");
-        for(;;); 
-    } else if (pid < 0) {
-        print("PRG1: the process PRG1 cannot be forked\n");
-    }
-
+    int fd;
+    
     print("PRG1: the process PRG1 is running\n");
+
+    fd = open("/dev/tty0");
+    read(fd, 0, 0);
+    write(fd, 0, 0);
+    close(fd);
+
     for(;;);
     return 0;
 }

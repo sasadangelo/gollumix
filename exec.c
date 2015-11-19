@@ -76,6 +76,9 @@ static int do_exec(char *name, struct pt_regs *regs) {
 	current->mem = prg_mem;
 	current->used_pages = required_pages;
 
+    // no tty associated
+    current->tty = -1;
+
     // set up LDT
     set_code_desc(&(current->ldt[1]), (u_long) current->mem, used_memory-1);
     set_data_desc(&(current->ldt[2]), (u_long) current->mem, used_memory-1);

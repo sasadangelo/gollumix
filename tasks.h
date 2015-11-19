@@ -8,7 +8,7 @@
 #ifndef TASKS_H
 #define TASKS_H
 
-#define NR_TASKS 8
+#define NR_TASKS 16
 
 #endif
 

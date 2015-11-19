@@ -61,6 +61,7 @@ struct task_struct {
     int pid;         // the process id
     char *mem;       // each process has only one page for code/data.
     unsigned long used_pages;   // how many "pages" the process uses
+    int tty;         // the tty associated to the process, -1 no tty
     struct desc_struct ldt[3];  // local descriptor table of the process
                                 // 0:null
                                 // 1:CS
@@ -79,6 +80,7 @@ struct task_struct {
      0,  \
      0,  \
      0,  \
+     -1, \
      {{0, 0}, \
       {0x9f, 0xc0fa00}, \
       {0x9f, 0xc0f200}, \

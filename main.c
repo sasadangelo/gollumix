@@ -71,18 +71,19 @@ void start_kernel(void) {
     // initialize the scheduler
     sched_init();
 
-    printk("Kernel info: %u bytes, start at %x end at %x\n",
+    printk("Kernel info: %u bytes, start at 0x%x0 end at 0x%x0.\n",
            K_SIZE, K_START, K_END);
 
     sti();
 
     // the idle process consume in kernel mode the characters coming on
-	// serial line. This code will be removed when a real TTY layer is added.
-	rs_loop();
+    // serial line. This code will be removed when a real TTY layer is added.
+    //rs_loop();
 
     // switch in user mode
     move_to_user_mode();
 
+    // spawn process 1 and run PRG1
     pid = fork();
 
     if (pid == 0) {
@@ -91,8 +92,6 @@ void start_kernel(void) {
         print("idle: cannot duplicate myself.\n");
     }
 
-    // this message will not be printed since the child process will be always
-    // up and running, so there is no chance for idle process to be scheduled.
     print("idle task is running.\n");
 
     // idle loop
