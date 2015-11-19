@@ -15,5 +15,6 @@ struct serial_struct {
 
 // serial routines
 extern void rs_init(void);
+extern int  rs_write(char *buffer, int size);
 
 #endif

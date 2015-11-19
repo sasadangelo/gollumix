@@ -8,7 +8,16 @@
 #ifndef TTY_H
 #define TTY_H
 
-void con_init(void);
-void tty_init(void);
+struct tty_struct {
+    int (*write)(char *buffer, int size);
+};
+
+// tty routines
+extern void tty_init(void);
+//extern int  get_current_tty_index(void);
+extern void tty_switch(int n);
+
+// current tty
+extern struct tty_struct *ctty;
 
 #endif

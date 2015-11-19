@@ -1,2 +1,28 @@
-Use the idle process to consume the characters coming from on the serial
-line.
+Add the 5th console that will be used for serial communication.
+
+To prompt a login, run on a linux box
+
+		setsid agetty 38400 ttyS0 ansi.
+
+On the 5th console of our kernel will appear the login prompt.
+Type user name and password and login on the system.
+
+if during ls command you see CTRL characters, please unalias the ls command
+in this way:
+	
+		unalias ls
+
+and if these characters appear on the prompt, redefine the PS1 env variable
+in this way:
+
+		export PS1=\>
+
+Files changed:
+--------------
+
+console.c
+console.h (new)
+keyboard.c
+tty.c     (new - old tty_io.c)
+tty.h
+main.c

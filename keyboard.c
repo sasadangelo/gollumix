@@ -10,6 +10,8 @@
 #include "kernel.h"
 #include "keymap.h"
 #include "irq.h"
+#include "tty.h"
+#include "string.h"
 
 #define LSHIFT   0x01
 #define RSHIFT   0x02
@@ -147,7 +149,7 @@ static void do_self(int sc) {
         ch |= 0x80;
     }
 
-	printk("%c", ch);
+	ctty->write(&ch, sizeof(char));
 }
 
 static void enter(int sc) {
@@ -189,7 +191,7 @@ static void slash(int sc) {
     } else if (kapplic) {
         applkey('Q');
     } else {
-		printk("/");
+        ctty->write("/", sizeof(char));
     }
 }
 
@@ -225,7 +227,7 @@ static void unalt(int sc) {
         // check if we press ALT-char code. For example if we press
 		// ALT-126 the ~ character should be printed.
 		if (npadch != 0) {
-			printk("%c", npadch);
+            ctty->write((char *)&npadch, sizeof(char));
 		    npadch=0;
 		}
     }
@@ -269,9 +271,9 @@ static void func(int sc) {
     }
 
     if ((kmode & (LCTRL|RCTRL)) && (kmode & ALT)) {
-        switch_to_console(sc+1);
+        tty_switch(sc+1);
     } else {
-        printk("%s", func_map[sc]);
+        ctty->write(func_map[sc], strlen(func_map[sc]));
     }
 }
 
@@ -317,8 +319,7 @@ static void cursor(int sc) {
 
     if (kleds & NUMLED) {
         ch = num_map[sc];
-
-		printk("%c", ch);
+        ctty->write(&ch, sizeof(char));
     }
 }
 

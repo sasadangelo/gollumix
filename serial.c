@@ -50,7 +50,7 @@ struct serial_struct rs_table[] = {
 };
 
 unsigned int rs_buffer[RS_QUEUE_MAX];
-unsigned int rs_bufferin  = 0;
+volatile unsigned int rs_bufferin  = 0;
 unsigned int rs_bufferout = 0;
 
 // get a character from the serial line
@@ -74,18 +74,38 @@ static void wait_for_xmitr(struct serial_struct *port)
     } while((status & EMPTY_HOLDING_REGS) != EMPTY_HOLDING_REGS);
 }
 
-// push a character on the serial line
+// push a byte on the serial line
 static void serial_out(unsigned int value, struct serial_struct *port,
                        int offset) {
     wait_for_xmitr(port);
     outb(value, port->base + offset);
 }
 
+// push a byte on the serial line
 static void serial_outp(unsigned int value, struct serial_struct *port,
                         int offset) {
     wait_for_xmitr(port);
     outb_p(value, port->base + offset);
 }
+
+// push a character on the serial line
+static void serial_putchar(char c, struct serial_struct *port) {
+    serial_out(c, port, 0);
+}
+
+// write the buffer on the serial line
+int rs_write(char *buffer, int size) {
+    //int i, index;
+    int i;
+
+    //index = get_current_tty_index() - 5;
+    for (i=0; i<size; ++i) {
+        serial_putchar(buffer[i], &rs_table[0]);
+    }
+
+    return size;
+}
+
 
 // Interrupt Service Routine
 static void rs_interrupt(void) {
@@ -97,9 +117,7 @@ static void rs_interrupt(void) {
             ch = serial_getchar(&rs_table[0]);
 
             rs_buffer[rs_bufferin++] = ch;
-            if (rs_bufferin == RS_QUEUE_MAX) {
-                rs_bufferin = 0;
-            }
+            rs_bufferin %= RS_QUEUE_MAX;
         }
     } while(c & 1);
 }

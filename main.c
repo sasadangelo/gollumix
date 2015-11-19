@@ -12,6 +12,7 @@
 #include "sched.h"
 #include "unistd.h"
 #include "serial.h"
+#include "console.h"
 
 _syscall1(int, print, char*, msg)
 _syscall0(int, fork)
@@ -24,7 +25,7 @@ extern void time_init(void);
 extern void sched_init(void);
 
 extern unsigned int rs_buffer[RS_QUEUE_MAX];
-extern unsigned int rs_bufferin;
+extern volatile unsigned int rs_bufferin;
 extern unsigned int rs_bufferout;
 
 // active wait on buffer to get data coming from serial line.
@@ -37,15 +38,13 @@ void rs_loop(void) {
         cli();
         if (rs_bufferin != rs_bufferout) {
             ch = rs_buffer[rs_bufferout++];
-            if (rs_bufferout == RS_QUEUE_MAX) {
-                rs_bufferout = 0;
-            }
+            rs_bufferout %= RS_QUEUE_MAX;
 
             switch(ch) {
             case 13:
                 break;
             default:
-                printk("%c", ch);
+                con_write2(5, (unsigned char *)&ch, sizeof(unsigned char));
             }
         }
         sti();
