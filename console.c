@@ -17,7 +17,7 @@
 #define SCR_W       80
 #define SCR_H       25
 #define SCR_SIZE    (SCR_W*SCR_H*2)
-
+#define MAX_USER_MSG 255
 #define is_valid_console(n) ((n)>=1 && (n)<=N_CONSOLES)
 
 struct console_s {
@@ -208,15 +208,10 @@ void switch_to_console(int n) {
  * A simple implementation of a debug system call
  */
 asmlinkage int sys_print(char *msg) {
-    char ch;
-    long flags;
+    char str[MAX_USER_MSG+1];
 
-    save_flags(flags); cli();
-    while ( (ch=get_fs_byte(msg)) ) {
-        print_char (ch);
-        msg++;
-    }
-    restore_flags(flags);
+    strncpy_from_user(str, msg, sizeof(str));
+	printk("%s", str);
     return 0;
 }
 

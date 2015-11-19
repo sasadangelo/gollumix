@@ -21,11 +21,39 @@ struct file_info {
     unsigned int size;  // size of the file
 };
 
-static int exec_proc(struct file_info *file, struct pt_regs *regs) {
-    unsigned long required_pages, used_memory;
-    char *prg_mem;
+/*
+ * This routine find the process on VFS. It returns 1 on successful and 0
+ * if it fails.
+ */
+static int vfs_find_file(char *name, struct file_info *file) {
+    struct vfs_header *vfs = (struct vfs_header*) K_REAL_END;
+    char *ptr = (char*) &vfs->node[vfs->n_files];
+    int i;
 
-    required_pages = ((file->size + USER_STACK_SIZE) + PAGE_SIZE -1)/PAGE_SIZE;
+    for(i=0; i<vfs->n_files; i++) {
+        if (!strcmp(vfs->node[i].name, name)) {
+            file->ptr = ptr;
+            file->size = vfs->node[i].size;
+            return 1;
+        }
+        ptr += vfs->node[i].size;
+    }
+    return 0;
+}
+
+static int do_exec(char *name, struct pt_regs *regs) {
+    unsigned long required_pages, used_memory;
+    struct file_info file;
+    char *prg_mem;
+    long flags;
+
+    save_flags(flags); cli();
+
+    if(!vfs_find_file(name, &file)) {
+        goto exec_error_noent;
+    }
+
+    required_pages = ((file.size + USER_STACK_SIZE) + PAGE_SIZE -1)/PAGE_SIZE;
     used_memory = required_pages * PAGE_SIZE;
 
     // allocate a page for code/data/stack
@@ -33,7 +61,7 @@ static int exec_proc(struct file_info *file, struct pt_regs *regs) {
 
     // if there is no memory available exit immediately
     if (!prg_mem) {
-        return -ENOMEM;
+        goto exec_error_nomem;
     }
 
     // free the process page if possible.
@@ -43,7 +71,7 @@ static int exec_proc(struct file_info *file, struct pt_regs *regs) {
 
     // clean memory and copy process code/data
     memset(prg_mem, 0, used_memory);
-    memcpy(prg_mem, file->ptr, file->size);
+    memcpy(prg_mem, file.ptr, file.size);
 
 	current->mem = prg_mem;
 	current->used_pages = required_pages;
@@ -66,59 +94,27 @@ static int exec_proc(struct file_info *file, struct pt_regs *regs) {
     regs->esi = 0;
     regs->edi = 0;
 
+    restore_flags(flags);
     return 0;
+
+exec_error_noent:
+    restore_flags(flags);
+    return -ENOENT;
+exec_error_nomem:
+    restore_flags(flags);
+    return -ENOMEM;
 }
-
-/*
- * This routine find the process on VFS. It returns 1 on successful and 0
- * if it fails.
- */
-static int vfs_find_file(char *name, struct file_info *file) {
-    struct vfs_header *vfs = (struct vfs_header*) K_REAL_END;
-    char *ptr = (char*) &vfs->node[vfs->n_files];
-    int i;
-
-    for(i=0; i<vfs->n_files; i++) {
-        if (!strcmp(vfs->node[i].name, name)) {
-            file->ptr = ptr;
-            file->size = vfs->node[i].size;
-            return 1;
-        }
-        ptr += vfs->node[i].size;
-    }
-    return 0;
-}
-
-static char tmp_name[VFS_MAX_FILE_NAME+1];
 
 /*
  * This routine simulates the exec system call on the kernel side.
  */
 asmlinkage int sys_exec(struct pt_regs regs) {
-    char *name = (char *) regs.ebx;
-    struct file_info file;
-    long flags;
-    int i, ret;
+    static char name[VFS_MAX_FILE_NAME+1];
+    char *uname = (char *) regs.ebx;
 
-    save_flags(flags); cli();
+    // copy the program name in user space
+    strncpy_from_user(name, uname, sizeof(name));
 
-    // copy filename from user space
-    // TODO: replace this code with the copy from user
-    for(i=0; i<=VFS_MAX_FILE_NAME; i++) {
-        tmp_name[i] = (char) get_fs_byte(&name[i]);
-        if (tmp_name[i] == '\0') break;
-    }
-
-    if(!vfs_find_file(tmp_name, &file))
-        goto exec_error_exit;
-
-    ret = exec_proc(&file, &regs);
-
-    restore_flags(flags);
-    return ret;
-
-exec_error_exit:
-    restore_flags(flags);
-    return -ENOENT;
+	return do_exec(name, &regs);
 }
 

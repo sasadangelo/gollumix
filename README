@@ -1,10 +1,10 @@
-In this step we remove the limitation of processes having only one page for
-code and data.
+In this step a reorganization of exec code is done. The copy of the program
+name from user space is done with a new strncpy_from_user routine.
+The same routine is used to semplify the implementation of syscall print.
 
 Files modified:
 ---------------
-sched.h
-fork.c
 exec.c
-mm.c
-mm.h
+uaccess.h
+usercopy.c (new)
+console.c
