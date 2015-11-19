@@ -38,10 +38,12 @@
 
 // UART PORT TYPE
 #define PORT_UNKNOWN   0
+#define PORT_8250      1
+#define PORT_16450     2
 
 static void rs_interrupt(void);
 
-// RS Table 
+// RS table - Type is defaults to PORT_UNKNOWN
 struct serial_struct rs_table[] = {
     // type          minor   base IRQ flags  speed          ISR
     { PORT_UNKNOWN,     0, 0x3f8,  4,    0,     0, rs_interrupt }
@@ -71,14 +73,23 @@ static void serial_out(unsigned int value, struct serial_struct *port,
     outb(value, port->base + offset);
 }
 
-// ISR of serial driver
+static void serial_outp(unsigned int value, struct serial_struct *port,
+                        int offset) {
+    wait_for_xmitr(port);
+    outb_p(value, port->base + offset);
+}
+
+// Interrupt Service Routine
 static void rs_interrupt(void) {
     printk("bytes coming on COM1.");
 }
 
 // port probing
 static int rs_setup(struct serial_struct *port) {
-    int divisor;
+    int divisor, c, scratch, status1, status2, retval;
+    //struct serial_struct port;
+
+    //port = *port_ptr;
 
     divisor = 115200 / port->speed;
     // turn off interrupt
@@ -94,6 +105,31 @@ static int rs_setup(struct serial_struct *port) {
     serial_out(0xc7, port, UART_FCR_REG);
     // turn on DTR, RTS and OUT2
     serial_out(0x0b, port, UART_MCR_REG);
+
+    // Probing UART model
+    if (serial_in(port, UART_LSR_REG) == 0xff) {
+        return -1;
+    }
+
+    retval = 0;
+
+    c = serial_in(port, UART_IIR_REG);
+    if (c & 0xc0) {
+        scratch = serial_in(port, UART_SCR);
+        serial_outp(0xa5, port, UART_SCR);
+        status1 = serial_in(port, UART_SCR);
+        serial_outp(0x5a, port, UART_SCR);
+        status2 = serial_in(port, UART_SCR);
+        serial_outp(scratch, port, UART_SCR);
+
+        if ((status1 != 0xa5) || (status2 != 0x5a))
+            port->type = PORT_8250;
+        else
+            port->type = PORT_16450;
+    } else {
+        port->type = PORT_UNKNOWN;
+        //retval = -1;
+    }
 
     // set the interrupt handler for the current serial line
     add_irq_handler(port->irq, port->isr);
@@ -143,9 +179,20 @@ static int rs_register(struct serial_struct *port, int baud, int bits,
     if (retval) {
         printk("serial_port_setup exit with return code: %d.\n", retval);
     } else {
-        printk("Registered ttyS%d (%d, %d%c%d) Base: 0x%x IRQ: %d.\n",
+        printk("Registered ttyS%d (%d, %d%c%d) Base: 0x%x IRQ: %d ",
            port->minor, port->speed, bits, parity, stop_bits,
            port->base, port->irq);
+
+        switch(port->type) {
+        case PORT_8250:
+            printk("[UART 8250].\n");
+            break;
+        case PORT_16450:
+            printk("[UART 16450].\n");
+            break;
+        default:
+            printk("[UART UNKNOWN].\n");
+        }
     }
 
     return retval;

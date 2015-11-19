@@ -1,4 +1,1 @@
-In this step a setup of COM1 is performed and  a message is
-displayed when characters comes on the serial line.
-
-The message will appear only when first character comes.
+Probing of the serial line type.
