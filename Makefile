@@ -3,6 +3,8 @@ LD=ld
 CC=gcc
 CPP=gcc -E
 LDS= kernel.lds
+OBJCOPY=objcopy -O binary -R .note -R .comment -S
+MAPFILE = System.map
 
 #Select one of these two option if you want compile in debug or not debug mode
 DEBUG =
@@ -33,8 +35,12 @@ setup: setup.o
 setup.o: setup.s
 	$(AS) -o $@ $<
 
-kernel: $(KERNEL_OBJ) $(LDS)
-	$(LD) -e stext -T $(LDS) -s --oformat binary $(KERNEL_OBJ) -o $@
+kernel: kernel.elf
+	$(OBJCOPY) $< $@
+
+kernel.elf: $(KERNEL_OBJ) $(LDS)
+	$(LD) -e stext -T $(LDS) -o $@ $(KERNEL_OBJ)
+	nm $@ | grep -v '\(compiled\)\|\(\.o$$\)\|\( [aU] \)\|\(\.\.ng$$\)\|\(LASH[RL]DI\)' | sort > $(MAPFILE)
 
 $(LDS):
 	$(CPP) -nostdinc -P -C -Ui386 -o $@ $@.S
@@ -62,4 +68,4 @@ image: kernel bootsect setup ./tools/build proc_1.bin proc_2.bin proc_3.bin proc
 
 clean:
 	rm -f *.o *.s kernel.lds *.bin
-	rm -rf bootsect setup kernel image ./tools/build
+	rm -rf bootsect setup kernel kernel.elf image ./tools/build System.map

@@ -1,4 +1,6 @@
-Add the support for serial line COM2. Define a new process (6) that work on 
-tty5. All the data coming from COM2 will be printed on tty5 and all the 
-characters typed by keyboard will be printed on COM2.
-
+Add the support for exception handling. Basically if an exception occurs,
+the CS and EIP register must be printed and the number of Exception.
+The build process should produce a System map that will be used to map
+CS:EIP with a kernel routine. 
+This will be very useful for debug purpose, to understand where the exception
+occured in the code.

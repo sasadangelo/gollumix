@@ -5,8 +5,8 @@
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
 
-#ifndef _PTRACE_H
-#define _PTRACE_H
+#ifndef PTRACE_H
+#define PTRACE_H
 
 /* this struct defines the way the registers are stored on the
  * stack during a system call. */

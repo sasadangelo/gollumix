@@ -195,3 +195,38 @@ HWINT_SLAVE(12)
 HWINT_SLAVE(13)
 HWINT_SLAVE(14)
 HWINT_SLAVE(15)
+
+#define _ex_common(n) \
+    SAVE_ALL;               \
+    pushl   $0x##n;         \
+    call    c_exception;    \
+    addl    $8, %esp;       \
+    jmp     ret_from_syscall;
+
+#define EXCEPTION(n) \
+    ENTRY(_exception0x##n)  \
+    _ex_common(n)
+
+#define ERR_EXCEPTION(n) \
+    ENTRY(_exception0x##n)  \
+    addl    $4, %esp;       \
+    _ex_common(n)
+
+EXCEPTION(00)
+EXCEPTION(01)
+EXCEPTION(02)
+EXCEPTION(03)
+EXCEPTION(04)
+EXCEPTION(05)
+EXCEPTION(06)
+EXCEPTION(07)
+ERR_EXCEPTION(08)
+EXCEPTION(09)
+ERR_EXCEPTION(0a)
+ERR_EXCEPTION(0b)
+ERR_EXCEPTION(0c)
+ERR_EXCEPTION(0d)
+ERR_EXCEPTION(0e)
+ENTRY(_exception0x0f)
+        jmp _unhand_int
+EXCEPTION(10)
