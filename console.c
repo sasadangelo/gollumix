@@ -159,25 +159,19 @@ static inline void print_char(struct console_struct *con, char c) {
 
 static char buf[1024];
 
-
-// write a string on console n
-void con_print2(int n, char *buffer, int size) {
+// write a string on current console
+static void con_print(char *buffer, int size) {
     long flags;
     int  i = 0;
 
     save_flags(flags); cli();
 
     while(i < size) {
-        print_char(&console[n], *(buffer+i));
+        print_char(cc, *(buffer+i));
         i++;
     }
 
     restore_flags(flags);
-}
-
-// write a string on current console
-static void con_print(char *buffer, int size) {
-    con_print2(cc-console, buffer, size);
 }
 
 // flush the data in tty->write_q on the video

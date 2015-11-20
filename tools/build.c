@@ -23,22 +23,34 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include "../vfs.h"
-
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned long u32;
+#include "../kernel_map.h"
 
 #define DEFAULT_MAJOR_ROOT 0
 #define DEFAULT_MINOR_ROOT 0
 
-// Minimal number of setup sectors (see also bootsect.S)
+// Number of sector for setup code (see also bootsect.S)
 #define SETUP_SECTS 4
+// Size of a sector
+#define SECT_SIZE   0x200
 
-byte buf[1024];
-int fd;
+// BOOT_SIZE  = size of boot sector
+// SETUP_SIZE = size of setup code
+// K_SIZE     = size of system image + processes (see kernel_map.h)
+#define BOOT_SIZE   SECT_SIZE
+#define SETUP_SIZE  SECT_SIZE*SETUP_SECTS
 
-void die(const char * str, ...)
-{
+#define msg_print(str, args...) fprintf(stderr, str, ## args)
+
+char buffer[BOOT_SIZE+SETUP_SIZE+K_MAX_SIZE];
+char *buf_ptr = buffer;
+const char *buf_end = buffer + sizeof(buffer);
+
+#define buf_used() (int)(buf_ptr-buffer)
+#define buf_free() (int)(buf_end-buf_ptr) 
+
+const char *IMAGE = "image";
+
+void die(const char * str, ...) {
     va_list args;
     va_start(args, str);
     vfprintf(stderr, str, args);
@@ -46,162 +58,177 @@ void die(const char * str, ...)
     exit(1);
 }
 
-void file_open(const char *name)
-{
-    if ((fd = open(name, O_RDONLY, 0)) < 0)
-        die("Unable to open `%s': %m", name);
+void usage(void) {
+    die("Usage: build bootsect setup system N proc1 ... procN");
 }
 
-void usage(void)
-{
-    die("Usage: build bootsect setup system N proc1 ... procN [> image]");
-}
-
-int main(int argc, char ** argv)
-{
-    unsigned int i, c, sz, setup_sectors;
-    unsigned int num_procs, size_header;
-    byte major_root, minor_root;
-    u32 sys_size, size_procs;
-    struct stat sb;
-    byte *buffer;
+int file_read(const char *name, const int size) {
+    FILE *in;
     int n;
 
+    msg_print("Reading %s... ", name);
+
+    if (buf_ptr+size > buf_end) {
+        die("build: not enough space to load %s", name);
+    }
+
+    in = fopen (name, "rb");
+
+    if (!in) {
+        die("build: unable to open %s", name); 
+    }
+
+    n = fread (buf_ptr, 1, buf_end-buf_ptr, in);
+
+    buf_ptr += n;
+
+    if(!feof(in)) {
+        die("build: file %s too big", name); 
+    }
+
+    fclose (in);
+
+    if (n != size && size != 0) {
+        die("build: size error for %s", name);
+    }
+
+    msg_print("ok!\n");
+    return n;
+}
+
+void write_image() {
+    FILE *image;
+    int size;
+
+    image = fopen(IMAGE, "wb");
+
+    if (!image) {
+        die("build: unable to write kernel image");
+    }
+
+    size = fwrite(buffer, 1, buf_used(), image);
+
+    fclose(image);
+
+    if (buf_used() != size) {
+        die("build: write error during kernel image writing");
+    }
+}
+
+// This toold read bootsect, setup, system and N processes and create a kernel
+// image on stdout. The caller of the tool should redirect this output on a file
+int main(int argc, char ** argv) {
     // The VFS structure used for our hardcoded processes
     struct vfs_header *vfs_h;
+    struct stat info;
+    unsigned int num_procs;
+    int ksize, size_header, proc_size, i;
 
-    if (argc < 5)
+    if (argc < 5) {
         usage();
+    }
 
     num_procs = atoi(argv[4]);
 
-    major_root = DEFAULT_MAJOR_ROOT;
-    minor_root = DEFAULT_MINOR_ROOT;
-	
-    fprintf(stderr, "Root device is (%d, %d)\n", major_root, minor_root);
+    msg_print("Root device is (%d, %d)\n", DEFAULT_MAJOR_ROOT, 
+                                           DEFAULT_MINOR_ROOT);
 
-    file_open(argv[1]);
-    i = read(fd, buf, sizeof(buf));
-    fprintf(stderr,"Boot sector %d bytes.\n",i);
-    if (i != 512)
-        die("Boot block must be exactly 512 bytes");
-    if (buf[510] != 0x55 || buf[511] != 0xaa)
-        die("Boot block hasn't got boot flag (0xAA55)");
-    buf[508] = minor_root;
-    buf[509] = major_root;
-    if (write(1, buf, 512) != 512)
-        die("Write call failed");
-    close (fd);
-
-    file_open(argv[2]);  // Copy the setup code
-    for (i=0 ; (c=read(fd, buf, sizeof(buf)))>0 ; i+=c )
-        if (write(1, buf, c) != c)
-            die("Write call failed");
-    if (c != 0)
-        die("read-error on `setup'");
-    close (fd);
-
-    setup_sectors = (i + 511) / 512; // Pad unused space with zeros
-    // for compatibility with ancient versions of LILO.
-    if (setup_sectors < SETUP_SECTS)
-        setup_sectors = SETUP_SECTS;
-    fprintf(stderr, "Setup is %d bytes.\n", i);
-    memset(buf, 0, sizeof(buf));
-    while (i < setup_sectors * 512) {
-        c = setup_sectors * 512 - i;
-        if (c > sizeof(buf))
-            c = sizeof(buf);
-        if (write(1, buf, c) != c)
-            die("Write call failed");
-        i += c;
+    ///////////////////////////////////////////////////////////////////////////
+    // READ BOOTSECT
+    //
+    // read the boot sector, making some check on it.
+    // A bootsector must be 512 bytes and its final word must be 0xAA55.
+    if (stat(argv[1], &info) < 0) {
+        die("build: unable to stat %s", argv[1]);
     }
 
-    file_open(argv[3]);
-    if (fstat (fd, &sb))
-        die("Unable to stat `%s': %m", argv[3]);
-    sz = sb.st_size;
-    fprintf (stderr, "System is %d kB\n", sz/1024);
-    sys_size = sz;
-	// 0x28000*16 = 2.5 MB, conservative estimate for the current maximum
-    if (((sys_size + 15) / 16) > DEF_SYSSIZE)
-        die("System is too big"); 
-    if (((sys_size + 15) / 16) > 0xefff)
-        fprintf(stderr,"warning: kernel is too big for standalone boot "
-                       "from floppy\n");
-    while (sz > 0) {
-        int l, n;
-
-        l = (sz > sizeof(buf)) ? sizeof(buf) : sz;
-        if ((n=read(fd, buf, l)) != l) {
-            if (n < 0)
-                die("Error reading %s: %m", argv[3]);
-            else
-                die("%s: Unexpected EOF", argv[3]);
-        }
-        if (write(1, buf, l) != l)
-            die("Write failed");
-        sz -= l;
+    if (info.st_size != SECT_SIZE) {
+        die("build: invalid size for %s", argv[1]);
     }
-    close(fd);
 
-    // ----------------------------------------------------------------------
-    // Here I assume the procs are very small, so they could be included in
-    // the buffer.
-    size_header = sizeof(struct vfs_header) + 
+    file_read(argv[1], info.st_size);
+
+    if (buffer[510] != (char)0x55 || buffer[511] != (char)0xAA) {
+        die("build: last word of %s must be 0xAA55", argv[1]);
+    }
+
+    buffer[508] = DEFAULT_MINOR_ROOT;
+    buffer[509] = DEFAULT_MAJOR_ROOT;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // READ SETUP
+    //
+    // read the setup code. The size of this code must be equal to 4 sectors.
+    if (stat(argv[2], &info) < 0) {
+        die("build: unable to stat %s", argv[2]);
+    }
+				    
+    if (info.st_size != SETUP_SIZE) {
+        die("build: invalid size for %s", argv[2]);
+    }
+
+    file_read(argv[2], SETUP_SIZE);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // READ SYSTEM
+    //
+    // read the system code and then print it on stdout.
+    ksize = file_read(argv[3], 0);
+    msg_print("System is %d bytes, %.1f Kb\n", ksize, (float)ksize/1024);
+
+    if (((ksize + 15) / 16) > DEF_SYSSIZE) {
+        die("build: the kernel is too big");
+    }
+
+    if (((ksize + 15) / 16) > 0xefff) {
+        msg_print("build: kernel is too big for standalone boot from floppy\n");
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // READ PROCESSES
+    //
+    // since our kernel does not support a filesystem yet, the processes code
+    // are appended to the kernel image in a very simple filesystem.
+    size_header = sizeof(struct vfs_header) +
                   num_procs * sizeof(struct node_struct);
 
-    sys_size += size_header;
-
-    buffer = buf;
-    vfs_h = (struct vfs_header*) buf;
-    vfs_h->n_files = num_procs;
-    buffer += size_header;
-    size_procs = size_header;
-
-    for (i = 0; i<num_procs; ++i) {
-        file_open(argv[5+i]);
-        if (fstat (fd, &sb)) {
-            die("Unable to stat `%s': %m", argv[5+i]);
-        }
-        sz = sb.st_size;
-        size_procs += sz;
-        sys_size += sz;
-        vfs_h->node[i].size = sz;
-        sprintf(vfs_h->node[i].name, "PRG%d", i+1);
-
-        if ((n=read(fd, buffer, sz)) != sz) {
-            if (n < 0)
-                die("Error reading %s: %m", argv[5+i]);
-            else
-                die("%s: Unexpected EOF", argv[5+i]);
-        }
-
-        buffer += sz;
-
-        close(fd);
-
-        fprintf(stderr, "Added process: %s, size: %d\n", 
-                        vfs_h->node[i].name,
-                        vfs_h->node[i].size);
+    if (buf_free() < size_header) {
+        die("build: VFS table too big");
     }
 
-    // write buf on stdout
-    write(1, buf, size_procs);
+    vfs_h = (struct vfs_header*) buf_ptr;
+    buf_ptr += size_header;
+    ksize += size_header;
+    vfs_h->n_files = num_procs;
 
-    // convert sys_size in 16 byte clicks.
-    sys_size = (sys_size + 15) / 16;
+    for (i = 0; i<num_procs; ++i) {
+        proc_size = file_read(argv[5+i], 0);
+        ksize += proc_size;
+        sprintf(vfs_h->node[i].name, "PRG%d", i+1);
+        vfs_h->node[i].size = proc_size;
 
-    if (lseek(1, 507, SEEK_SET) != 507) // Write sizes to the bootsector
-        die("Output: seek failed");
-    buf[0] = setup_sectors;
-    if (write(1, buf, 1) != 1)
-        die("Write of setup sector count failed");
-    if (lseek(1, 508, SEEK_SET) != 508)
-        die("Output: seek failed");
-    buf[0] = (sys_size & 0xff);
-    buf[1] = ((sys_size >> 8) & 0xff);
-    if (write(1, buf, 2) != 2)
-        die("Write of image length failed");
+        msg_print("Added process: %s, size: %d\n", vfs_h->node[i].name,
+                                                   vfs_h->node[i].size);
+    }
 
-    return 0; // Everything is OK
+    if (ksize > K_MAX_SIZE) {
+        die("build: kernel+processes exceed max size allowed");
+    }
+
+    msg_print("Kernel image (+tasks) %d bytes, %.1f Kb, %.1f%%\n",
+              ksize, (float)ksize/1024, (float)(ksize*100/K_MAX_SIZE));
+
+    // convert sys_size in 16 byte clicks and write in the boot sector.
+    ksize = (ksize + 15) / 16;
+
+    buffer[508] = (char)(ksize & 0xFF);
+    buffer[509] = (char)((ksize >> 8) & 0xFF);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // WRITE IMAGE on DISK
+    //
+    // write boot sector + setup + kernel + processes on disk.
+    write_image(); 
+
+    return 0;
 }

@@ -24,32 +24,7 @@ extern void init_irq(void);
 extern void time_init(void);
 extern void sched_init(void);
 
-extern unsigned int rs_buffer[RS_QUEUE_MAX];
-extern volatile unsigned int rs_bufferin;
-extern unsigned int rs_bufferout;
-
-// active wait on buffer to get data coming from serial line.
-// This method will be removed in next article.
-void rs_loop(void) {
-    unsigned int ch;
-
-    // idle loop
-    while(1) {
-        cli();
-        if (rs_bufferin != rs_bufferout) {
-            ch = rs_buffer[rs_bufferout++];
-            rs_bufferout %= RS_QUEUE_MAX;
-
-            switch(ch) {
-            case 13:
-                break;
-            default:
-                con_print2(5, (unsigned char *)&ch, sizeof(unsigned char));
-            }
-        }
-        sti();
-    }
-}
+extern char __KERNEL_END__;
 
 /*
  * This is the kernel main routine. When the boot process is completed, this
@@ -72,13 +47,9 @@ void start_kernel(void) {
     sched_init();
 
     printk("Kernel info: %u bytes, start at 0x%x0 end at 0x%x0.\n",
-           K_SIZE, K_START, K_END);
+           &__KERNEL_END__-K_START, K_START, &__KERNEL_END__);
 
     sti();
-
-    // the idle process consume in kernel mode the characters coming on
-    // serial line. This code will be removed when a real TTY layer is added.
-    //rs_loop();
 
     // switch in user mode
     move_to_user_mode();
@@ -119,7 +90,16 @@ void start_kernel(void) {
         print("idle: cannot duplicate myself.\n");
     }   
 
-    print("idle task is running.\n");
+    // spawn process 5 and run PRG5
+    pid = fork();
+
+    if (pid == 0) {
+        exec("PRG5");
+    } else if (pid < 0) {
+        print("idle: cannot duplicate myself.\n");
+    }
+
+    print("Idle: ok!.\n");
 
     // idle loop
     while(1);

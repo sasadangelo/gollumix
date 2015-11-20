@@ -15,7 +15,6 @@ struct console_struct {
 // console routines
 extern void con_init  (void);
 extern void con_write (struct tty_struct *tty);
-extern void con_print2(int n, char *buffer, int size);
 extern void con_switch(int n);
 
 #endif

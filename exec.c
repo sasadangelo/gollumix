@@ -16,6 +16,8 @@
 #include "uaccess.h"
 #include "ptrace.h"
 
+extern char __KERNEL_END__;
+
 struct file_info {
     char *ptr;          // memory location
     unsigned int size;  // size of the file
@@ -26,7 +28,7 @@ struct file_info {
  * if it fails.
  */
 static int vfs_find_file(char *name, struct file_info *file) {
-    struct vfs_header *vfs = (struct vfs_header*) K_REAL_END;
+    struct vfs_header *vfs = (struct vfs_header*) &__KERNEL_END__;
     char *ptr = (char*) &vfs->node[vfs->n_files];
     int i;
 

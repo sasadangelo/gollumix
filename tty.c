@@ -13,28 +13,29 @@
 #include "stddef.h"
 #include "uaccess.h"
 
-#define N_TTYS          N_CONSOLES
+#define N_TTYS          N_CONSOLES+N_SERIALS
 #define IS_VALID_TTY(n) ((n) >= 1 && (n) <= N_TTYS)
 
 #define INIT_QUEUE { { NULL }, 0, 0, 0, ""}
 
 // TTY_TABLE
 //
-// /dev/tty0    tty[0]    dev = 0
-// /dev/tty1    tty[1]    dev = 1
-// /dev/tty2    tty[2]    dev = 2
-// /dev/tty3    tty[3]    dev = 3
-// /dev/ttyS0   tty[4]    dev = 4
-// /dev/ttyS1   tty[5]    dev = 5
+// /dev/tty0    tty_table[1]    dev = 1
+// /dev/tty1    tty_table[2]    dev = 2
+// /dev/tty2    tty_table[3]    dev = 3
+// /dev/tty3    tty_table[4]    dev = 4
+// /dev/tty4    tty_table[5]    dev = 5
+// /dev/ttyS0   tty_table[6]    dev = 6
 #define TTY_TABLE(dev) &tty_table[dev];
 
 struct tty_struct tty_table[N_TTYS+1] = {
     { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // not used
-    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty 1
-    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty 2
-    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty 3
-    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty 4
-    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, rs_write  },  // tty 5
+    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty0 
+    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty1
+    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty2
+    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty3
+    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty4
+    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, rs_write  },  // ttyS0
 };
 
 struct tty_struct *ctty = &tty_table[1];
@@ -106,7 +107,7 @@ static void tty_close(struct file * filp) {
     }
 }
 
-static int read_chan(struct file *file, char *buf, int nr) {
+static int read_chan(struct file *file, char *buf, int nr) { 
     struct tty_struct *tty;
     char *b = buf;
     int c;
