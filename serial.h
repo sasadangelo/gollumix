@@ -4,7 +4,7 @@
 #include "tty.h"
 
 #define RS_QUEUE_MAX    4096
-#define N_SERIALS       1
+#define N_SERIALS       2
 
 struct serial_struct {
     short type;

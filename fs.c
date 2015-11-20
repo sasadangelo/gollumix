@@ -177,8 +177,12 @@ static int open_tty(const char *pathname, struct file *filp) {
         filp->dev = 4;
     } else if (!strcmp(pathname, "/dev/tty4")) {
         filp->dev = 5;
-    } else if (!strcmp(pathname, "/dev/ttyS0")) {
+    } else if (!strcmp(pathname, "/dev/tty5")) {
         filp->dev = 6;
+    } else if (!strcmp(pathname, "/dev/ttyS0")) {
+        filp->dev = 7;
+    } else if (!strcmp(pathname, "/dev/ttyS1")) {
+        filp->dev = 8;
     } else {
         return -EINVAL;
     }

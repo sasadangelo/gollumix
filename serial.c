@@ -39,12 +39,14 @@
 #define PORT_8250      1
 #define PORT_16450     2
 
-static void rs_interrupt(void);
+static void com1_interrupt(void);
+static void com2_interrupt(void);
 
 // RS table - Type is defaults to PORT_UNKNOWN
 struct serial_struct rs_table[] = {
-    // type          minor   base IRQ flags  speed          ISR
-    { PORT_UNKNOWN,     0, 0x3f8,  4,    0,     0, rs_interrupt }
+    // type          minor   base IRQ flags  speed            ISR
+    { PORT_UNKNOWN,     0, 0x3f8,  4,    0,     0, com1_interrupt },
+    { PORT_UNKNOWN,     1, 0x2f8,  3,    0,     0, com2_interrupt }
 };
 
 // get a character from the serial line
@@ -89,24 +91,36 @@ static void serial_putchar(char c, struct serial_struct *port) {
 
 // write the buffer on the serial line
 void rs_write(struct tty_struct *tty) {
+    int port = tty - &tty_table[7];
     char c;
 
     while((c = getch(&tty->write_q)) >= 0) {
-        serial_putchar(c, &rs_table[0]);
+        serial_putchar(c, &rs_table[port]);
     }
 }
 
 // Interrupt Service Routine
-static void rs_interrupt(void) {
+static void rs_interrupt(struct tty_struct *tty) {
     unsigned int c, ch;
-    
+    int port = tty - &tty_table[7];
+
     do {
-        c = serial_in(&rs_table[0], UART_LSR_REG);
+        c = serial_in(&rs_table[port], UART_LSR_REG);
         if (c & 1) {
-            ch = serial_getchar(&rs_table[0]);
-            put_queue(&tty_table[6].read_q, ch);
+            ch = serial_getchar(&rs_table[port]);
+            if (ch != 13) {
+                put_queue(&tty->read_q, ch);
+            }
         }
     } while(c & 1);
+}
+
+static void com1_interrupt(void) {
+    rs_interrupt(&tty_table[7]);
+}
+
+static void com2_interrupt(void) {
+    rs_interrupt(&tty_table[8]);
 }
 
 // port probing

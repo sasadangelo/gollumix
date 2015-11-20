@@ -1,6 +1,4 @@
-Add a new process (5) that work on tty4. All the data coming from COM1,
-will be printed on tty4 and all the characters typed by keyboard will be
-printed on COM1.
+Add the support for serial line COM2. Define a new process (6) that work on 
+tty5. All the data coming from COM2 will be printed on tty5 and all the 
+characters typed by keyboard will be printed on COM2.
 
-In this step I had to rework tools/build.c to allow a process greater than
-1024 bytes to be executed. I also improved the code.

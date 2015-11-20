@@ -3,7 +3,7 @@
 
 #include "tty.h"
 
-#define N_CONSOLES          5
+#define N_CONSOLES          6
 
 struct console_struct {
     unsigned long video;    // start video RAM for console n

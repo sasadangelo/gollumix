@@ -99,6 +99,15 @@ void start_kernel(void) {
         print("idle: cannot duplicate myself.\n");
     }
 
+    // spawn process 6 and run PRG6
+    pid = fork();
+
+    if (pid == 0) {
+        exec("PRG6");
+    } else if (pid < 0) {
+        print("idle: cannot duplicate myself.\n");
+    }
+
     print("Idle: ok!.\n");
 
     // idle loop

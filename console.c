@@ -37,6 +37,7 @@ static struct console_struct console[N_CONSOLES+1] = {
     MAKE_CONSOLE(3),    // Console 3
     MAKE_CONSOLE(4),    // Console 4
     MAKE_CONSOLE(5),    // Console 5
+    MAKE_CONSOLE(6),    // Console 6
 };
 
 /* Current console: */

@@ -25,7 +25,9 @@
 // /dev/tty2    tty_table[3]    dev = 3
 // /dev/tty3    tty_table[4]    dev = 4
 // /dev/tty4    tty_table[5]    dev = 5
-// /dev/ttyS0   tty_table[6]    dev = 6
+// /dev/tty5    tty_table[6]    dev = 6
+// /dev/ttyS0   tty_table[7]    dev = 7
+// /dev/ttyS1   tty_table[8]    dev = 8
 #define TTY_TABLE(dev) &tty_table[dev];
 
 struct tty_struct tty_table[N_TTYS+1] = {
@@ -35,7 +37,9 @@ struct tty_struct tty_table[N_TTYS+1] = {
     { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty2
     { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty3
     { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty4
+    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty5
     { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, rs_write  },  // ttyS0
+    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, rs_write  },  // ttyS1
 };
 
 struct tty_struct *ctty = &tty_table[1];
