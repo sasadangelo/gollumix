@@ -1,1 +1,1 @@
-Implement the open/close system calls for tty layer.
+Move task related code from sched.h and sched.c to task.h and task.c.
