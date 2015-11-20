@@ -146,10 +146,10 @@ static void do_self(int sc) {
     // ALT key, the bit 7 is activated. For LATIN-1 map the character is
     // prepended with 0x33 value (now not handled).
     if (kmode & ALT) {
-        ch |= 0x80;
+        put_queue(&ctty->read_q, ch|0x80);
     }
 
-	ctty->write(&ch, sizeof(char));
+	put_queue(&ctty->read_q, ch);
 }
 
 static void enter(int sc) {
@@ -191,7 +191,7 @@ static void slash(int sc) {
     } else if (kapplic) {
         applkey('Q');
     } else {
-        ctty->write("/", sizeof(char));
+        put_queue(&ctty->read_q, '/');
     }
 }
 
@@ -227,7 +227,7 @@ static void unalt(int sc) {
         // check if we press ALT-char code. For example if we press
 		// ALT-126 the ~ character should be printed.
 		if (npadch != 0) {
-            ctty->write((char *)&npadch, sizeof(char));
+            put_queue(&ctty->read_q, npadch);
 		    npadch=0;
 		}
     }
@@ -273,7 +273,7 @@ static void func(int sc) {
     if ((kmode & (LCTRL|RCTRL)) && (kmode & ALT)) {
         tty_switch(sc+1);
     } else {
-        ctty->write(func_map[sc], strlen(func_map[sc]));
+        puts_queue(&ctty->read_q, func_map[sc]);
     }
 }
 
@@ -319,7 +319,7 @@ static void cursor(int sc) {
 
     if (kleds & NUMLED) {
         ch = num_map[sc];
-        ctty->write(&ch, sizeof(char));
+        put_queue(&ctty->read_q, ch);
     }
 }
 

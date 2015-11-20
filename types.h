@@ -12,7 +12,9 @@ typedef unsigned char   u_char;
 typedef unsigned short  u_short;
 typedef unsigned int    u_int;
 typedef unsigned long   u_long;
+typedef int             ssize_t;
+typedef unsigned short  dev_t;
 
-typedef int  ssize_t;
+typedef enum {false = 0, true = 1 } bool;
 
 #endif

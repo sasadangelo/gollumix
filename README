@@ -1,11 +1,1 @@
-Define here the STUB code for 4 new system calls: open, close, read, write.
-Basically each process will do:
-
-	int fd;
-	
-	fd = open("/dev/ttyX", ...);
-	while(...) {
-	
-	}
-	
-	close(fd);
+Implement the open/close system calls for tty layer.

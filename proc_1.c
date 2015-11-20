@@ -20,10 +20,7 @@ int main(void) {
     print("PRG1: the process PRG1 is running\n");
 
     fd = open("/dev/tty0");
-    read(fd, 0, 0);
-    write(fd, 0, 0);
     close(fd);
-
     for(;;);
     return 0;
 }

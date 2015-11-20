@@ -3,6 +3,7 @@
 
 #include "tasks.h"
 #include "system.h"
+#include "fs.h"
 
 #define HZ 100
 
@@ -50,23 +51,38 @@ struct task_struct {
     /*
      * Do not change these three values.
      */
-    long state;      // This is the process state. These are the following
-                     // values:
-                     //
-                     // TASK_RUNNING
+    // This is the process state. These are the following values:
+    //
+    // TASK_RUNNING
+    long state;
 
-    long counter;    // dynamic priority
-    long priority;   // static priority
+    // dynamic priority
+    long counter;
+    // static priority
+    long priority;
 
-    int pid;         // the process id
-    char *mem;       // each process has only one page for code/data.
-    unsigned long used_pages;   // how many "pages" the process uses
-    int tty;         // the tty associated to the process, -1 no tty
-    struct desc_struct ldt[3];  // local descriptor table of the process
-                                // 0:null
-                                // 1:CS
-                                // 2:DS,SS
-    struct tss_struct tss;      // the task state segment of the process
+    // the process id
+    int pid;
+
+    // each process has only one page for code/data.
+    char *mem;
+    // how many "pages" the process uses
+    unsigned long used_pages;
+
+    // the tty associated to the process, -1 no tty
+    int tty;
+
+    // local descriptor table of the process
+    // 0:null
+    // 1:CS
+    // 2:DS,SS
+    struct desc_struct ldt[3];
+
+    // the task state segment of the process
+    struct tss_struct tss;
+
+    // open file table
+    struct file * filp[NR_OPEN];
 };
 
 /*
@@ -89,7 +105,8 @@ struct task_struct {
       0,0,0,0,0,0,0,0,0,0, \
       USER_DS,0,USER_CS,0,USER_DS,0,USER_DS,0,USER_DS,0,USER_DS,0, \
       _LDT(0),0, 0, 0xDFFF, _TSS(0) \
-     } \
+     }, \
+     {0,} \
     }
 
 /*
