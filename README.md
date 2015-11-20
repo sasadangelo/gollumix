@@ -17,6 +17,7 @@ Patches, forks, pull requests, suggestions or harsh flame is welcome! First of a
 ## License
 
 This project is under GNU GPL v3. See LICENSE for more information.
+
 ----------------------------------------------------------------------------------------------
 In this step we change the boot process (in particolar bootsect.S) in order
 to be able to boot our kernel with a boot loader like LILO.
