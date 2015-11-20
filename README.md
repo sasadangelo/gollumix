@@ -1,4 +1,4 @@
-# Gollimux 0.0.61
+# Gollumix 0.0.61
 
 A simple Linux like kernel for educational purpose
 
