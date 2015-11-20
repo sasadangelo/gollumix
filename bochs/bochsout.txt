@@ -1,0 +1,299 @@
+00000000000i[     ] Bochs x86 Emulator 2.1.1
+00000000000i[     ]   February 08, 2004
+00000000000i[     ] System configuration
+00000000000i[     ]   processors: 1
+00000000000i[     ]   A20 line support: yes
+00000000000i[     ]   APIC support: yes
+00000000000i[     ] CPU configuration
+00000000000i[     ]   level: 6
+00000000000i[     ]   fpu support: yes
+00000000000i[     ]   paging support: yes, tlb enabled: yes
+00000000000i[     ]   mmx support: yes
+00000000000i[     ]   sse support: 1
+00000000000i[     ]   v8086 mode support: yes
+00000000000i[     ]   3dnow! support: no
+00000000000i[     ]   PAE support: yes
+00000000000i[     ]   PGE support: yes
+00000000000i[     ]   PSE support: yes
+00000000000i[     ]   x86-64 support: no
+00000000000i[     ]   SEP support: no
+00000000000i[     ] Optimization configuration
+00000000000i[     ]   Guest2HostTLB support: yes
+00000000000i[     ]   RepeatSpeedups support: yes
+00000000000i[     ]   Icache support: no
+00000000000i[     ]   Host Asm support: yes
+00000000000i[MEM0 ] allocated memory at 0x4038d008. after alignment, vector=0x4038e000
+00000000000i[MEM0 ] 32.00MB
+00000000000i[MEM0 ] rom at 0xf0000/65536 ('/usr/share/bochs/BIOS-bochs-latest')
+00000000000i[MEM0 ] rom at 0xc0000/32768 ('/usr/share/bochs/VGABIOS-elpin-2.40')
+00000000000i[APIC?] local apic in  initializing
+00000000000i[APIC0] 80686
+00000000000i[     ] lt_dlhandle is 0x820b880
+00000000000i[PLGIN] loaded plugin libbx_unmapped.la
+00000000000i[     ] lt_dlhandle is 0x820b8e0
+00000000000i[PLGIN] loaded plugin libbx_biosdev.la
+00000000000i[     ] lt_dlhandle is 0x820bdd8
+00000000000i[PLGIN] loaded plugin libbx_cmos.la
+00000000000i[     ] lt_dlhandle is 0x820c398
+00000000000i[PLGIN] loaded plugin libbx_dma.la
+00000000000i[     ] lt_dlhandle is 0x820ccf0
+00000000000i[PLGIN] loaded plugin libbx_pic.la
+00000000000i[     ] lt_dlhandle is 0x820c4a8
+00000000000i[PLGIN] loaded plugin libbx_vga.la
+00000000000i[     ] lt_dlhandle is 0x820d488
+00000000000i[PLGIN] loaded plugin libbx_floppy.la
+00000000000i[     ] lt_dlhandle is 0x820df88
+00000000000i[PLGIN] loaded plugin libbx_harddrv.la
+00000000000i[     ] lt_dlhandle is 0x8213a88
+00000000000i[PLGIN] loaded plugin libbx_keyboard.la
+00000000000i[     ] lt_dlhandle is 0x8213ae8
+00000000000i[PLGIN] loaded plugin libbx_serial.la
+00000000000i[     ] lt_dlhandle is 0x82148e8
+00000000000i[PLGIN] loaded plugin libbx_parallel.la
+00000000000i[     ] lt_dlhandle is 0x8214de8
+00000000000i[PLGIN] loaded plugin libbx_extfpuirq.la
+00000000000i[     ] lt_dlhandle is 0x8215290
+00000000000i[PLGIN] loaded plugin libbx_gameport.la
+00000000000i[CMOS ] Using local time for initial clock
+00000000000i[CMOS ] Setting initial clock to: Tue Aug 24 00:48:13 2004 (time0=1093301293)
+00000000000i[DMA  ] channel 4 used by cascade
+00000000000i[DMA  ] channel 2 used by Floppy Drive
+00000000000i[FDD  ] fd0: '/dev/fd0' ro=0, h=2,t=80,spt=18
+00000000000i[XGUI ] test_alloc_colors: 16 colors available out of 16 colors tried
+00000000000i[XGUI ] font 8 wide x 16 high, display depth = 24
+00000000000i[KMAP ] Loading keymap from '/usr/share/bochs/keymaps/x11-pc-it.map'
+00000000000i[KMAP ] Loaded 170 symbols
+00000000000i[VGA  ] interval=300000
+00000000000i[PLGIN] init_mem of 'harddrv' plugin device by virtual method
+00000000000i[PLGIN] init_mem of 'keyboard' plugin device by virtual method
+00000000000i[PLGIN] init_mem of 'serial' plugin device by virtual method
+00000000000i[PLGIN] init_mem of 'parallel' plugin device by virtual method
+00000000000i[PLGIN] init_mem of 'extfpuirq' plugin device by virtual method
+00000000000i[PLGIN] init_mem of 'gameport' plugin device by virtual method
+00000000000i[PLGIN] init_dev of 'harddrv' plugin device by virtual method
+00000000000i[HD   ] Boot device will be 'a'
+00000000000i[HD   ] Floppy boot signature check is disabled
+00000000000i[PLGIN] init_dev of 'keyboard' plugin device by virtual method
+00000000000i[KBD  ] will paste characters every 1000 keyboard ticks
+00000000000i[PLGIN] init_dev of 'serial' plugin device by virtual method
+00000000000i[SER  ] com1 at 0x03f8 irq 4
+00000000000i[PLGIN] init_dev of 'parallel' plugin device by virtual method
+00000000000i[PAR  ] parallel port 1 at 0x378 irq 7
+00000000000i[PLGIN] init_dev of 'extfpuirq' plugin device by virtual method
+00000000000i[PLGIN] init_dev of 'gameport' plugin device by virtual method
+00000000000i[PLGIN] reset of 'harddrv' plugin device by virtual method
+00000000000i[PLGIN] reset of 'keyboard' plugin device by virtual method
+00000000000i[PLGIN] reset of 'serial' plugin device by virtual method
+00000000000i[PLGIN] reset of 'parallel' plugin device by virtual method
+00000000000i[PLGIN] reset of 'extfpuirq' plugin device by virtual method
+00000000000i[PLGIN] reset of 'gameport' plugin device by virtual method
+00000000000i[     ] set SIGINT handler to bx_debug_ctrlc_handler
+00000004325i[BIOS ]  rombios.c,v 1.103.2.2 2004/02/02 22:39:22 cbothamy Exp $
+00000300000e[VGA  ] character height = 1, skipping text update
+00000318066i[KBD  ] reset-disable command received
+00000600000i[XGUI ] charmap update. Font Height is 16
+00004269488e[HD   ] device set to 0 which does not exist
+00004269781e[HD   ] device set to 1 which does not exist
+00004282733i[BIOS ] int13_diskette: unsupported AH=41
+00004287373i[BIOS ] int13_diskette: unsupported AH=41
+00004292007i[BIOS ] int13_diskette: unsupported AH=41
+00004296661i[BIOS ] int13_diskette: unsupported AH=41
+00004301295i[BIOS ] int13_diskette: unsupported AH=41
+00004305929i[BIOS ] int13_diskette: unsupported AH=41
+00004310563i[BIOS ] int13_diskette: unsupported AH=41
+00004315197i[BIOS ] int13_diskette: unsupported AH=41
+00004319831i[BIOS ] int13_diskette: unsupported AH=41
+00004324465i[BIOS ] int13_diskette: unsupported AH=41
+00004329099i[BIOS ] int13_diskette: unsupported AH=41
+00004333733i[BIOS ] int13_diskette: unsupported AH=41
+00004338367i[BIOS ] int13_diskette: unsupported AH=41
+00004343001i[BIOS ] int13_diskette: unsupported AH=41
+00004347635i[BIOS ] int13_diskette: unsupported AH=41
+00004352289i[BIOS ] int13_diskette: unsupported AH=41
+00004356923i[BIOS ] int13_diskette: unsupported AH=41
+00004361557i[BIOS ] int13_diskette: unsupported AH=41
+00004371232i[BIOS ] int13_diskette: unsupported AH=41
+00004405378i[BIOS ] int13_diskette: unsupported AH=41
+00004410095i[BIOS ] int13_diskette: unsupported AH=41
+00004414812i[BIOS ] int13_diskette: unsupported AH=41
+00004508553i[BIOS ] int13_diskette: unsupported AH=41
+00008085477i[BIOS ] int13_diskette: unsupported AH=41
+00008090201i[BIOS ] int13_diskette: unsupported AH=41
+00008094938i[BIOS ] int13_diskette: unsupported AH=41
+00008099696i[BIOS ] int13_diskette: unsupported AH=41
+00008104536i[BIOS ] int13_diskette: unsupported AH=41
+00008109528i[BIOS ] int13_diskette: unsupported AH=41
+00008114280i[BIOS ] int13_diskette: unsupported AH=41
+00008119032i[BIOS ] int13_diskette: unsupported AH=41
+00008123784i[BIOS ] int13_diskette: unsupported AH=41
+00008128540i[BIOS ] int13_diskette: unsupported AH=41
+00008133286i[BIOS ] int13_diskette: unsupported AH=41
+00008138059i[BIOS ] int13_diskette: unsupported AH=41
+00008142806i[BIOS ] int13_diskette: unsupported AH=41
+00008147552i[BIOS ] int13_diskette: unsupported AH=41
+00008152298i[BIOS ] int13_diskette: unsupported AH=41
+00008157044i[BIOS ] int13_diskette: unsupported AH=41
+00008161790i[BIOS ] int13_diskette: unsupported AH=41
+00008166536i[BIOS ] int13_diskette: unsupported AH=41
+00008171282i[BIOS ] int13_diskette: unsupported AH=41
+00008176028i[BIOS ] int13_diskette: unsupported AH=41
+00008180774i[BIOS ] int13_diskette: unsupported AH=41
+00008185520i[BIOS ] int13_diskette: unsupported AH=41
+00008190266i[BIOS ] int13_diskette: unsupported AH=41
+00008195039i[BIOS ] int13_diskette: unsupported AH=41
+00008199785i[BIOS ] int13_diskette: unsupported AH=41
+00008204531i[BIOS ] int13_diskette: unsupported AH=41
+00008209277i[BIOS ] int13_diskette: unsupported AH=41
+00008214023i[BIOS ] int13_diskette: unsupported AH=41
+00008218769i[BIOS ] int13_diskette: unsupported AH=41
+00008223515i[BIOS ] int13_diskette: unsupported AH=41
+00008228261i[BIOS ] int13_diskette: unsupported AH=41
+00008233007i[BIOS ] int13_diskette: unsupported AH=41
+00008237753i[BIOS ] int13_diskette: unsupported AH=41
+00008242499i[BIOS ] int13_diskette: unsupported AH=41
+00008247245i[BIOS ] int13_diskette: unsupported AH=41
+00008252018i[BIOS ] int13_diskette: unsupported AH=41
+00008256764i[BIOS ] int13_diskette: unsupported AH=41
+00008261510i[BIOS ] int13_diskette: unsupported AH=41
+00008266256i[BIOS ] int13_diskette: unsupported AH=41
+00008271002i[BIOS ] int13_diskette: unsupported AH=41
+00008275748i[BIOS ] int13_diskette: unsupported AH=41
+00008280494i[BIOS ] int13_diskette: unsupported AH=41
+00008285240i[BIOS ] int13_diskette: unsupported AH=41
+00008289986i[BIOS ] int13_diskette: unsupported AH=41
+00008294732i[BIOS ] int13_diskette: unsupported AH=41
+00008299478i[BIOS ] int13_diskette: unsupported AH=41
+00008304229i[BIOS ] int13_diskette: unsupported AH=41
+00008308975i[BIOS ] int13_diskette: unsupported AH=41
+00008313721i[BIOS ] int13_diskette: unsupported AH=41
+00008318467i[BIOS ] int13_diskette: unsupported AH=41
+00008323213i[BIOS ] int13_diskette: unsupported AH=41
+00008327959i[BIOS ] int13_diskette: unsupported AH=41
+00008332705i[BIOS ] int13_diskette: unsupported AH=41
+00008337451i[BIOS ] int13_diskette: unsupported AH=41
+00008342197i[BIOS ] int13_diskette: unsupported AH=41
+00008346943i[BIOS ] int13_diskette: unsupported AH=41
+00008351689i[BIOS ] int13_diskette: unsupported AH=41
+00008356435i[BIOS ] int13_diskette: unsupported AH=41
+00008361208i[BIOS ] int13_diskette: unsupported AH=41
+00008365954i[BIOS ] int13_diskette: unsupported AH=41
+00008370700i[BIOS ] int13_diskette: unsupported AH=41
+00008375446i[BIOS ] int13_diskette: unsupported AH=41
+00008380192i[BIOS ] int13_diskette: unsupported AH=41
+00008384938i[BIOS ] int13_diskette: unsupported AH=41
+00008389685i[BIOS ] int13_diskette: unsupported AH=41
+00008394431i[BIOS ] int13_diskette: unsupported AH=41
+00008399177i[BIOS ] int13_diskette: unsupported AH=41
+00008403923i[BIOS ] int13_diskette: unsupported AH=41
+00008408669i[BIOS ] int13_diskette: unsupported AH=41
+00008413419i[BIOS ] int13_diskette: unsupported AH=41
+00008418165i[BIOS ] int13_diskette: unsupported AH=41
+00008422911i[BIOS ] int13_diskette: unsupported AH=41
+00008427657i[BIOS ] int13_diskette: unsupported AH=41
+00008432403i[BIOS ] int13_diskette: unsupported AH=41
+00008437149i[BIOS ] int13_diskette: unsupported AH=41
+00008441895i[BIOS ] int13_diskette: unsupported AH=41
+00008446641i[BIOS ] int13_diskette: unsupported AH=41
+00008451387i[BIOS ] int13_diskette: unsupported AH=41
+00008456133i[BIOS ] int13_diskette: unsupported AH=41
+00008460879i[BIOS ] int13_diskette: unsupported AH=41
+00008465625i[BIOS ] int13_diskette: unsupported AH=41
+00008470398i[BIOS ] int13_diskette: unsupported AH=41
+00008475145i[BIOS ] int13_diskette: unsupported AH=41
+00008479891i[BIOS ] int13_diskette: unsupported AH=41
+00008484637i[BIOS ] int13_diskette: unsupported AH=41
+00008489383i[BIOS ] int13_diskette: unsupported AH=41
+00008494129i[BIOS ] int13_diskette: unsupported AH=41
+00008498875i[BIOS ] int13_diskette: unsupported AH=41
+00008503621i[BIOS ] int13_diskette: unsupported AH=41
+00008508367i[BIOS ] int13_diskette: unsupported AH=41
+00008513113i[BIOS ] int13_diskette: unsupported AH=41
+00008517859i[BIOS ] int13_diskette: unsupported AH=41
+00008522633i[BIOS ] int13_diskette: unsupported AH=41
+00008527379i[BIOS ] int13_diskette: unsupported AH=41
+00008532125i[BIOS ] int13_diskette: unsupported AH=41
+00008536871i[BIOS ] int13_diskette: unsupported AH=41
+00008541617i[BIOS ] int13_diskette: unsupported AH=41
+00008546363i[BIOS ] int13_diskette: unsupported AH=41
+00008551109i[BIOS ] int13_diskette: unsupported AH=41
+00008555855i[BIOS ] int13_diskette: unsupported AH=41
+00008560602i[BIOS ] int13_diskette: unsupported AH=41
+00008565348i[BIOS ] int13_diskette: unsupported AH=41
+00008570094i[BIOS ] int13_diskette: unsupported AH=41
+00008574839i[BIOS ] int13_diskette: unsupported AH=41
+00008579799i[BIOS ] int13_diskette: unsupported AH=41
+00008584545i[BIOS ] int13_diskette: unsupported AH=41
+00008589291i[BIOS ] int13_diskette: unsupported AH=41
+00008594037i[BIOS ] int13_diskette: unsupported AH=41
+00008598783i[BIOS ] int13_diskette: unsupported AH=41
+00008603529i[BIOS ] int13_diskette: unsupported AH=41
+00008608275i[BIOS ] int13_diskette: unsupported AH=41
+00008613021i[BIOS ] int13_diskette: unsupported AH=41
+00008617767i[BIOS ] int13_diskette: unsupported AH=41
+00008622513i[BIOS ] int13_diskette: unsupported AH=41
+00008627259i[BIOS ] int13_diskette: unsupported AH=41
+00008632005i[BIOS ] int13_diskette: unsupported AH=41
+00008636776i[BIOS ] int13_diskette: unsupported AH=41
+00008641522i[BIOS ] int13_diskette: unsupported AH=41
+00008646268i[BIOS ] int13_diskette: unsupported AH=41
+00008651015i[BIOS ] int13_diskette: unsupported AH=41
+00008655761i[BIOS ] int13_diskette: unsupported AH=41
+00008660507i[BIOS ] int13_diskette: unsupported AH=41
+00008665253i[BIOS ] int13_diskette: unsupported AH=41
+00008669999i[BIOS ] int13_diskette: unsupported AH=41
+00008674745i[BIOS ] int13_diskette: unsupported AH=41
+00008679491i[BIOS ] int13_diskette: unsupported AH=41
+00008684237i[BIOS ] int13_diskette: unsupported AH=41
+00008689008i[BIOS ] int13_diskette: unsupported AH=41
+00008693754i[BIOS ] int13_diskette: unsupported AH=41
+00008698500i[BIOS ] int13_diskette: unsupported AH=41
+00008703246i[BIOS ] int13_diskette: unsupported AH=41
+00008707992i[BIOS ] int13_diskette: unsupported AH=41
+00008712738i[BIOS ] int13_diskette: unsupported AH=41
+00008717484i[BIOS ] int13_diskette: unsupported AH=41
+00008722230i[BIOS ] int13_diskette: unsupported AH=41
+00008726976i[BIOS ] int13_diskette: unsupported AH=41
+00008731722i[BIOS ] int13_diskette: unsupported AH=41
+00008736469i[BIOS ] int13_diskette: unsupported AH=41
+00008741218i[BIOS ] int13_diskette: unsupported AH=41
+00008745989i[BIOS ] int13_diskette: unsupported AH=41
+00008750735i[BIOS ] int13_diskette: unsupported AH=41
+00008755481i[BIOS ] int13_diskette: unsupported AH=41
+00008760227i[BIOS ] int13_diskette: unsupported AH=41
+00008764973i[BIOS ] int13_diskette: unsupported AH=41
+00008769719i[BIOS ] int13_diskette: unsupported AH=41
+00008774465i[BIOS ] int13_diskette: unsupported AH=41
+00008779211i[BIOS ] int13_diskette: unsupported AH=41
+00008783957i[BIOS ] int13_diskette: unsupported AH=41
+00008788703i[BIOS ] int13_diskette: unsupported AH=41
+00008793449i[BIOS ] int13_diskette: unsupported AH=41
+00008798197i[BIOS ] int13_diskette: unsupported AH=41
+00008802943i[BIOS ] int13_diskette: unsupported AH=41
+00008807689i[BIOS ] int13_diskette: unsupported AH=41
+00008812435i[BIOS ] int13_diskette: unsupported AH=41
+00008817181i[BIOS ] int13_diskette: unsupported AH=41
+00008821928i[BIOS ] int13_diskette: unsupported AH=41
+00008826674i[BIOS ] int13_diskette: unsupported AH=41
+00008831420i[BIOS ] int13_diskette: unsupported AH=41
+00008836166i[BIOS ] int13_diskette: unsupported AH=41
+00008840912i[BIOS ] int13_diskette: unsupported AH=41
+00008845658i[BIOS ] int13_diskette: unsupported AH=41
+00008850404i[BIOS ] int13_diskette: unsupported AH=41
+00008855175i[BIOS ] int13_diskette: unsupported AH=41
+00008859921i[BIOS ] int13_diskette: unsupported AH=41
+00008864667i[BIOS ] int13_diskette: unsupported AH=41
+00008869413i[BIOS ] int13_diskette: unsupported AH=41
+00008874159i[BIOS ] int13_diskette: unsupported AH=41
+00008878905i[BIOS ] int13_diskette: unsupported AH=41
+00008883651i[BIOS ] int13_diskette: unsupported AH=41
+00008888397i[BIOS ] int13_diskette: unsupported AH=41
+00008893143i[BIOS ] int13_diskette: unsupported AH=41
+00008897889i[BIOS ] int13_diskette: unsupported AH=41
+00008902635i[BIOS ] int13_diskette: unsupported AH=41
+00008907384i[BIOS ] int13_diskette: unsupported AH=41
+00008912130i[BIOS ] int13_diskette: unsupported AH=41
+00008916876i[BIOS ] int13_diskette: unsupported AH=41
+00008921622i[BIOS ] int13_diskette: unsupported AH=41
+00008926368i[BIOS ] int13_diskette: unsupported AH=41
+00008931114i[BIOS ] int13_diskette: unsupported AH=41
+00010687287i[SER  ] FIFO enabled
