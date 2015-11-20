@@ -159,8 +159,9 @@ static inline void print_char(struct console_struct *con, char c) {
 
 static char buf[1024];
 
+
 // write a string on console n
-int con_write2(int n, char *buffer, int size) {
+void con_print2(int n, char *buffer, int size) {
     long flags;
     int  i = 0;
 
@@ -172,12 +173,31 @@ int con_write2(int n, char *buffer, int size) {
     }
 
     restore_flags(flags);
-    return size;
 }
 
 // write a string on current console
-int con_write(char *buffer, int size) {
-    return con_write2(cc-console, buffer, size);
+static void con_print(char *buffer, int size) {
+    con_print2(cc-console, buffer, size);
+}
+
+// flush the data in tty->write_q on the video
+void con_write(struct tty_struct *tty) {
+    unsigned long flags;
+    unsigned int currcons;
+    char c;
+
+    save_flags(flags); cli();
+
+    // TODO
+    // the original code wake up processes. I am not sure on this.
+
+    currcons = tty - tty_table;
+
+    while((c = getch(&tty->write_q)) >= 0) {
+        print_char(&console[currcons], c);
+    }
+    
+    restore_flags(flags);
 }
 
 // this is a kernel routine equivalent to the stdlib printf
@@ -189,7 +209,7 @@ asmlinkage int printk(const char *fmt, ...) {
     len = vsprintf(buf,fmt,args);
     va_end(args);
 
-    con_write(buf, len);
+    con_print(buf, len);
     return len;
 }
 

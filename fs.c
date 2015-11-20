@@ -139,7 +139,6 @@ asmlinkage ssize_t sys_read(int fd, char *buf, size_t count) {
 }
 
 asmlinkage ssize_t sys_write(int fd, char *buf, size_t count) {
-/*
     struct file *file;
 
     if (fd < 0 || fd >=NR_OPEN) {
@@ -161,9 +160,9 @@ asmlinkage ssize_t sys_write(int fd, char *buf, size_t count) {
     }
 
     if (file->f_op && file->f_op->write) {
-        return file->f_op->write(buf, count);
+        return file->f_op->write(file, buf, count);
     }
-*/
+
     return -EINVAL;
 }
 

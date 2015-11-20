@@ -26,10 +26,6 @@ int main(void) {
         print("PRG1: cannot open the tty0 terminal.\n");
     }
 
-    char output[2];
-
-    output[1] = '\0';
-
     for (;;) {
         // sleep the process
         res = read(fd, &ch, sizeof(char));
@@ -39,9 +35,12 @@ int main(void) {
             continue;
         }
 
-        output[0] = ch;
-	
-        print(output);
+        res = write(fd, &ch, sizeof(char));
+
+        if (res < 0) {
+            print("PRG1: cannot write data to tty0.\n");
+            continue;
+        }
     }
 
     res = close(fd);

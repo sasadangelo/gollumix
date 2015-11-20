@@ -44,7 +44,7 @@ void rs_loop(void) {
             case 13:
                 break;
             default:
-                con_write2(5, (unsigned char *)&ch, sizeof(unsigned char));
+                con_print2(5, (unsigned char *)&ch, sizeof(unsigned char));
             }
         }
         sti();

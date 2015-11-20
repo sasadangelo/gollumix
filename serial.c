@@ -5,8 +5,6 @@
 
 // COMx base address
 #define COM_BASE_ADDR 0x400
-// RS table size
-#define RS_TABLE_LEN  1
 
 #define DLAB_ON       0x80
 
@@ -94,18 +92,13 @@ static void serial_putchar(char c, struct serial_struct *port) {
 }
 
 // write the buffer on the serial line
-int rs_write(char *buffer, int size) {
-    //int i, index;
-    int i;
+void rs_write(struct tty_struct *tty) {
+    char c;
 
-    //index = get_current_tty_index() - 5;
-    for (i=0; i<size; ++i) {
-        serial_putchar(buffer[i], &rs_table[0]);
+    while((c = getch(&tty->write_q)) >= 0) {
+        serial_putchar(c, &rs_table[0]);
     }
-
-    return size;
 }
-
 
 // Interrupt Service Routine
 static void rs_interrupt(void) {
@@ -251,7 +244,7 @@ void rs_init(void) {
     // COM4 base address = 0x406
     //
     // If COMx base address is 0 then the port is not present.
-    for (i = 0; i < RS_TABLE_LEN; i++ , *ptraddr++) {
+    for (i = 0; i < N_SERIALS; i++ , *ptraddr++) {
         if (*ptraddr) {
             // register serial port
             rs_register(&rs_table[i], baud, bits, parity, stop_bits);

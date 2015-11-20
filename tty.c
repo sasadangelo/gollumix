@@ -5,7 +5,6 @@
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
 #include "system.h"
-#include "tty.h"
 #include "serial.h"
 #include "console.h"
 #include "fs.h"
@@ -150,6 +149,39 @@ static int read_chan(struct file *file, char *buf, int nr) {
 }
 
 static int write_chan(struct file * file, char * buf, int nr) { 
+    struct tty_struct * tty;
+    char c, *b=buf;
+
+    tty = TTY_TABLE(file->dev);
+
+    while (nr > 0) {
+        if (FULL(&tty->write_q)) {
+            TTY_WRITE_FLUSH(tty);
+            cli();
+            if (FULL(&tty->write_q)) {
+                sleep(&tty->write_q.wait);
+            }
+            sti();
+            continue;
+        }
+
+        while (nr > 0 && !FULL(&tty->write_q)) {
+            c = get_user_byte(b);
+            b++; nr--;
+            putch(c, &tty->write_q);
+        }
+
+        if (nr > 0) {
+            schedule();
+        }
+    }
+
+    TTY_WRITE_FLUSH(tty);
+
+    if (b-buf) {
+        return b - buf;
+    }
+
     return 0;
 }
 

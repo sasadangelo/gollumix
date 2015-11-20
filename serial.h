@@ -1,7 +1,10 @@
 #ifndef SERIAL_H
 #define SERIAL_H
 
+#include "tty.h"
+
 #define RS_QUEUE_MAX    4096
+#define N_SERIALS       1
 
 struct serial_struct {
     short type;
@@ -15,6 +18,6 @@ struct serial_struct {
 
 // serial routines
 extern void rs_init(void);
-extern int  rs_write(char *buffer, int size);
+extern void rs_write(struct tty_struct *tty);
 
 #endif

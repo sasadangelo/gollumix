@@ -57,7 +57,7 @@ struct tty_struct {
                                        // read data from this queue.
 
     // write method
-    int (*write)(char *buffer, int size);
+    void (*write)(struct tty_struct *tty);
 };
 
 // tty routines
@@ -66,5 +66,7 @@ extern void tty_switch(int n);
 
 // current tty
 extern struct tty_struct *ctty;
+// tty table
+extern struct tty_struct tty_table[];
 
 #endif

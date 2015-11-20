@@ -102,4 +102,8 @@ set_data_desc(void *_desc, unsigned long base, unsigned long limit) {
                 (limit & 0x0000ffff);
 }
 
+extern inline void put_fs_byte(char val,char *addr) {
+    __asm__ ("movb %0,%%fs:%1"::"q" (val),"m" (*addr));
+}
+
 #endif

@@ -1,6 +1,8 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
+#include "tty.h"
+
 #define N_CONSOLES          5
 
 struct console_struct {
@@ -12,8 +14,8 @@ struct console_struct {
 
 // console routines
 extern void con_init  (void);
-extern int  con_write (char *buffer, int size);
-extern int  con_write2(int n, char *buffer, int size);
+extern void con_write (struct tty_struct *tty);
+extern void con_print2(int n, char *buffer, int size);
 extern void con_switch(int n);
 
 #endif
