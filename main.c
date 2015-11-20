@@ -56,7 +56,7 @@ void rs_loop(void) {
  * function is called.
  */
 void start_kernel(void) {
-    int pid;
+    int pid, i;
 
     // init traps
     init_traps();
@@ -95,5 +95,8 @@ void start_kernel(void) {
     print("idle task is running.\n");
 
     // idle loop
-    while(1);
+    while(1) {
+        print("idle task is running now. Press a key to restart PRG1 ...\n");
+        for (i=0; i<100000000; ++i);
+    }
 }

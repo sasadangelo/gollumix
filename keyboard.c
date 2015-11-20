@@ -147,9 +147,11 @@ static void do_self(int sc) {
     // prepended with 0x33 value (now not handled).
     if (kmode & ALT) {
         put_queue(&ctty->read_q, ch|0x80);
+        //ch |= 0x80;
     }
 
 	put_queue(&ctty->read_q, ch);
+	//ctty->write(&ch, sizeof(char));
 }
 
 static void enter(int sc) {
@@ -192,6 +194,7 @@ static void slash(int sc) {
         applkey('Q');
     } else {
         put_queue(&ctty->read_q, '/');
+        //ctty->write("/", sizeof(char));
     }
 }
 
@@ -228,6 +231,7 @@ static void unalt(int sc) {
 		// ALT-126 the ~ character should be printed.
 		if (npadch != 0) {
             put_queue(&ctty->read_q, npadch);
+            //ctty->write((char *)&npadch, sizeof(char));
 		    npadch=0;
 		}
     }
@@ -274,6 +278,7 @@ static void func(int sc) {
         tty_switch(sc+1);
     } else {
         puts_queue(&ctty->read_q, func_map[sc]);
+        //ctty->write(func_map[sc], strlen(func_map[sc]));
     }
 }
 
@@ -320,6 +325,7 @@ static void cursor(int sc) {
     if (kleds & NUMLED) {
         ch = num_map[sc];
         put_queue(&ctty->read_q, ch);
+        //ctty->write(&ch, sizeof(char));
     }
 }
 

@@ -11,11 +11,12 @@
 #include "fs.h"
 #include "sched.h"
 #include "kernel.h"
+#include "stddef.h"
 
 #define N_TTYS          N_CONSOLES
 #define IS_VALID_TTY(n) ((n) >= 1 && (n) <= N_TTYS)
 
-#define INIT_QUEUE {0, 0, 0, 0, ""}
+#define INIT_QUEUE { { NULL }, 0, 0, 0, ""}
 
 // TTY_TABLE
 //
@@ -82,12 +83,10 @@ void tty_switch(int n) {
 static int tty_open(struct file * filp) {
     struct tty_struct *tty;
 
-    printk("tty_open: start.\n");
     tty = TTY_TABLE(filp->dev);
     tty->count++;
     current->tty = filp->dev;
 
-    printk("CURRENT(TTY)=%d.\n", current->tty);
     // TODO
     // if it is a serial line call serial_open. This should activate the
     // interrupts on the serial line.
@@ -101,14 +100,18 @@ static void tty_close(struct file * filp) {
     tty = TTY_TABLE(filp->dev);
     current->tty=-1;
 
-    printk("tty_close: %d.\n", filp->dev);
-
     if (--tty->count) {
         return;
     }
 }
 
 static int read_chan(struct file *file, char *buf, int nr) {
+    struct tty_struct *tty;
+
+    tty = TTY_TABLE(file->dev);
+
+    printk("current process sleeping on channel %d ... \n", file->dev);
+    sleep(&tty->read_q.wait);
     return 0;
 }
 

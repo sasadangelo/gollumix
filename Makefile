@@ -14,7 +14,7 @@ KEYBOARD = -DKBD_IT
 
 KERNEL_OBJ=head.o main.o tty.o keyboard.o console.o asm.o vsprintf.o irq.o \
 	traps.o time.o mktime.o sched.o sys.o mm.o panic.o errno.o fork.o exec.o \
-	usercopy.o serial.o fs.o tty_queue.o
+	usercopy.o serial.o fs.o tty_queue.o task.o wait_queue.o
 
 all: image
 

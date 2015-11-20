@@ -66,7 +66,7 @@ int fork(void);
 int exec(char *filename);
 int open(const char *pathname);
 int close(int fd);
-ssize_t read(int fd, void *buf, size_t count);
-ssize_t write(int fd, void *buf, size_t count);
+ssize_t read (int fd, char *buf, size_t count);
+ssize_t write(int fd, char *buf, size_t count);
 
 #endif

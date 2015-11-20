@@ -64,4 +64,6 @@ unsigned long __limit; \
 __asm__("lsll %1,%0\n\tincl %0":"=r" (__limit):"r" (segment)); \
 __limit;})
 
+extern void schedule(void);
+
 #endif

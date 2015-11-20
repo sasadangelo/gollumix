@@ -8,6 +8,7 @@
 #define TTY_QUEUE_H
 
 #include "types.h"
+#include "wait_queue.h"
 
 #define TTY_BUF_SIZE 2048
 
@@ -18,10 +19,10 @@
 #define INC(a) ((a) = ((a)+1) & (TTY_BUF_SIZE-1))
 
 struct tty_queue {
+    struct wait_queue wait;
     unsigned long data;
     unsigned long head;
     unsigned long tail;
-    struct task_struct *tasks;
     char buf[TTY_BUF_SIZE];
 };
 

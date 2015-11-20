@@ -14,11 +14,9 @@ void put_queue(struct tty_queue* queue, int ch) {
     if (new_head != queue->tail) {
         queue->head=new_head;
     }
-    
-	// if there are processes waiting, woken up the first one
-    if (queue->tasks) {
-        queue->tasks->state=0;
-    }
+
+    // if there are processes waiting, woken up them
+    wake_up(&queue->wait);
 }
 
 void puts_queue(struct tty_queue* queue, char *cp) {
@@ -34,7 +32,5 @@ void puts_queue(struct tty_queue* queue, char *cp) {
     }
 
     // if there are processes waiting, woken up them
-    if (queue->tasks) {
-        queue->tasks->state=0;
-    }
+    wake_up(&queue->wait);
 }

@@ -1,1 +1,4 @@
-Move task related code from sched.h and sched.c to task.h and task.c.
+Define sleep/wakeup feature. To test this new feature call read from a process
+to sleep it and wake up the same process pressing a key.
+
+Please work on first terminal.

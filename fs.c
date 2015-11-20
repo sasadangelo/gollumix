@@ -20,8 +20,6 @@ asmlinkage int sys_open(const char *pathname) {
     struct file * f;
     int fd, i;
 
-    printk("open: start.\n");
-
     // look for a free file descriptor
     for(fd=0 ; fd<NR_OPEN ; fd++) {
         if (!current->filp[fd]) {
@@ -33,8 +31,6 @@ asmlinkage int sys_open(const char *pathname) {
         // no file descriptor available, return an error
         return -EINVAL;
     }
-
-    printk("fd=%d, look for a file.\n", fd);
 
     // look for a free file in the file table
     f=0+file_table;
@@ -60,36 +56,30 @@ asmlinkage int sys_open(const char *pathname) {
     // convert the pathname in inode. The inode will contains the file 
 	// operation for the specific file or device.
     if ((i = open_tty(kpath, f)) < 0) {
-        printk("open_tty: failed.\n");
         current->filp[fd]=NULL;
         f->f_count=0;
         return i;
     }
 
-    printk("open_tty: ok.\n");
     //f->f_count = 1;
     //f->f_op = ..... inode ops ...;
     //current->filp[fd] = f;
 
     if (f->f_op && f->f_op->open) {
         if ((i = f->f_op->open(f))) {
-	        printk("tty_open: failed.\n");
             f->f_count = 0;
             current->filp[fd]=NULL;
             return i;
         }
     }
 
-    printk("open: successful: %d.\n", fd);
     return fd;
 }
 
 asmlinkage int sys_close(int fd) {
     struct file *filp;
 
-    printk("close: start.\n");
-
-    // chack file descriptor
+    // check file descriptor
     if (fd < 0 || fd >=NR_OPEN) { 
         return -EBADF;
     }
@@ -104,7 +94,6 @@ asmlinkage int sys_close(int fd) {
     current->filp[fd] = NULL;
 
     if (filp->f_count == 0) {
-        printk("close: file count is 0\n");
         return 0;
     }
 
@@ -114,8 +103,6 @@ asmlinkage int sys_close(int fd) {
         return 0;
     }
 
-    printk("close: continue.\n");
-
     // ok, last process has closed the file. Release resources.
     if (filp->f_op && filp->f_op->release) {
         filp->f_op->release(filp);
@@ -123,34 +110,77 @@ asmlinkage int sys_close(int fd) {
 
     filp->f_count--;
 
-    printk("close: successful.\n");
     return 0;
 }
 
-asmlinkage ssize_t sys_read(int fd, void *buf, size_t count) {
+asmlinkage ssize_t sys_read(int fd, char *buf, size_t count) {
+
+    struct file *file;
+
+    if (fd < 0 || fd >=NR_OPEN || !(current->filp[fd])) {
+        return -EBADF;
+    }
+
+    file = current->filp[fd];
+
+    if (!count) {
+        return 0;
+    }
+
+    if (count < 0) {
+        return -EINVAL;
+    }
+
+    if (file->f_op && file->f_op->read) {
+        return file->f_op->read(file, buf, count);
+    }
+
     return -EINVAL;
 }
 
-asmlinkage ssize_t sys_write(int fd, void *buf, size_t count) {
+asmlinkage ssize_t sys_write(int fd, char *buf, size_t count) {
+/*
+    struct file *file;
+
+    if (fd < 0 || fd >=NR_OPEN) {
+        return -EBADF;
+    }
+
+    file = current->filp[fd];
+				    
+    if (!file) {
+        return -EBADF;
+    }
+
+    if (!count) {
+        return 0;
+    }
+
+    if (count < 0) {
+        return -EINVAL;
+    }
+
+    if (file->f_op && file->f_op->write) {
+        return file->f_op->write(buf, count);
+    }
+*/
     return -EINVAL;
 }
 
 static int open_tty(const char *pathname, struct file *filp) {
-    printk("open_tty: %s start.\n", pathname);
     if (!strcmp(pathname, "/dev/tty0")) {
-        filp->dev = 0;
-    } else if (!strcmp(pathname, "/dev/tty1")) {
         filp->dev = 1;
-    } else if (!strcmp(pathname, "/dev/tty2")) {
+    } else if (!strcmp(pathname, "/dev/tty1")) {
         filp->dev = 2;
-    } else if (!strcmp(pathname, "/dev/tty3")) {
+    } else if (!strcmp(pathname, "/dev/tty2")) {
         filp->dev = 3;
-    } else if (!strcmp(pathname, "/dev/ttyS0")) {
+    } else if (!strcmp(pathname, "/dev/tty3")) {
         filp->dev = 4;
-    } else if (!strcmp(pathname, "/dev/ttyS1")) {
+    } else if (!strcmp(pathname, "/dev/ttyS0")) {
         filp->dev = 5;
+    } else if (!strcmp(pathname, "/dev/ttyS1")) {
+        filp->dev = 6;
     } else {
-        printk("open_tty: failed.\n");
         return -EINVAL;
     }
 

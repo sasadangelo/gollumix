@@ -11,10 +11,11 @@
 #include "system.h"
 #include "tasks.h"
 #include "fs.h"
+#include "wait_queue.h"
 
 // task states
 #define TASK_RUNNING         0
-//#define TASK_INTERRUPTIBLE   1
+#define TASK_INTERRUPTIBLE   1
 
 #define FIRST_TASK task[0]
 #define LAST_TASK  task[NR_TASKS-1]
@@ -127,6 +128,10 @@ struct task_struct {
 extern struct task_struct *current;
 // the tasks table
 extern struct task_struct *task[NR_TASKS];
+
+// sleep/wakeup routines
+extern void wake_up(struct wait_queue *queue);
+extern void sleep(struct wait_queue *queue);
 
 #endif
 
