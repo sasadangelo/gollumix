@@ -8,7 +8,7 @@
 #ifndef MC146818RTC_H
 #define MC146818RTC_H
 
-#include "io.h"
+#include <asm/io.h>
 
 #define CMOS_READ(addr) ({ \
     outb_p(addr|0x80,0x70); \

@@ -8,8 +8,8 @@
 #ifndef KERNEL_MAP_H
 #define KERNEL_MAP_H
 
-#include "config.h"
-#include "mm.h"
+#include <gollumix/config.h>
+#include <gollumix/mm.h>
 
 // Start address of the kernel
 #define K_START    DEF_SYSADDR

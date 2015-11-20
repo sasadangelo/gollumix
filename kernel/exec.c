@@ -5,23 +5,23 @@
  * This code simulates an exec system call. It should be remove when this
  * kernel will support real filesystems.
  */
-#include "kernel_map.h"
-#include "vfs.h"
-#include "sched.h"
-#include "mm.h"
-#include "errno.h"
-#include "kernel.h"
-#include "string.h"
-#include "types.h"
-#include "uaccess.h"
-#include "ptrace.h"
+#include <gollumix/kernel_map.h>
+#include <gollumix/vfs.h>
+#include <gollumix/sched.h>
+#include <gollumix/mm.h>
+#include <gollumix/errno.h>
+#include <gollumix/kernel.h>
+#include <asm/string.h>
+#include <gollumix/types.h>
+#include <asm/uaccess.h>
+#include <gollumix/ptrace.h>
 
 extern char __KERNEL_END__;
 
 struct file_info {
     char *ptr;          // memory location
     unsigned int size;  // size of the file
-};
+}; 
 
 /*
  * This routine find the process on VFS. It returns 1 on successful and 0

@@ -7,8 +7,8 @@
 #ifndef TTY_QUEUE_H
 #define TTY_QUEUE_H
 
-#include "types.h"
-#include "wait_queue.h"
+#include <gollumix/types.h>
+#include <gollumix/wait_queue.h>
 
 #define TTY_BUF_SIZE 2048
 

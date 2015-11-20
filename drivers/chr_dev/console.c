@@ -4,14 +4,13 @@
  * Copyright (C) 2003 Open Community
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
-
-#include "system.h"
-#include "vsprintf.h"
-#include "io.h"
-#include "kernel.h"
-#include "string.h"
-#include "uaccess.h"
-#include "console.h"
+#include <asm/system.h>
+#include <gollumix/vsprintf.h>
+#include <asm/io.h>
+#include <gollumix/kernel.h>
+#include <asm/string.h>
+#include <asm/uaccess.h>
+#include <gollumix/console.h>
 
 #define ORIG_X 0
 // the memory location 0x94010 contains the current cursor position.

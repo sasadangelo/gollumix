@@ -4,14 +4,13 @@
  * Copyright (C) 2003 Open Community
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
-
-#include "kernel.h"
-#include "io.h"
-#include "irq.h"
-#include "sched.h"
-#include "mktime.h"
-#include "mc146818rtc.h"
-#include "time.h"
+#include <gollumix/kernel.h>
+#include <asm/io.h>
+#include <gollumix/irq.h>
+#include <gollumix/sched.h>
+#include <gollumix/mktime.h>
+#include <gollumix/mc146818rtc.h>
+#include <gollumix/time.h>
 
 #define RTC_ALWAYS_BCD 1
 

@@ -4,8 +4,7 @@
  * Copyright (C) 2003 Open Community
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
-
-#include "kernel.h"
+#include <gollumix/kernel.h>
 
 /*
  * This function is used through-out the kernel (includeinh mm and fs)

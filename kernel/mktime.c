@@ -4,8 +4,7 @@
  * Copyright (C) 2003 Open Community
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
-
-#include "mktime.h"
+#include <gollumix/mktime.h>
 
 #define MINUTE 60
 #define HOUR (60*MINUTE)

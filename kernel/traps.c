@@ -4,10 +4,10 @@
  * Copyright (C) 2003 Open Community
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
-#include "kernel.h"
-#include "system.h"
-#include "ptrace.h"
-#include "task.h"
+#include <gollumix/kernel.h>
+#include <asm/system.h>
+#include <gollumix/ptrace.h>
+#include <gollumix/task.h>
 
 #define IDT_ELEMENTS (sizeof(idt)/sizeof(struct desc_struct))
 

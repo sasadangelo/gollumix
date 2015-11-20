@@ -1,7 +1,13 @@
-#include "io.h"
-#include "kernel.h"
-#include "serial.h"
-#include "irq.h"
+/*
+ * serial.c
+ *
+ * Copyright (C) 2003 Open Community
+ * author Salvatore D'Angelo (koala.gnu@tiscali.it)
+ */
+#include <asm/io.h>
+#include <gollumix/kernel.h>
+#include <gollumix/serial.h>
+#include <gollumix/irq.h>
 
 // COMx base address
 #define COM_BASE_ADDR 0x400

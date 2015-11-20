@@ -1,18 +1,4 @@
-int main(void);
-
-void _start(void) {  // offset 0x0
-    while(1)
-        main();
-}
-
-#include "unistd.h"
-
-_syscall1(int, print, char*, msg)
-_syscall0(int, fork)
-_syscall1(int, open, const char*, pathname)
-_syscall1(int, close, int, fd)
-_syscall3(ssize_t, read,  int, fd, char *, buf, size_t, count)
-_syscall3(ssize_t, write, int, fd, char *, buf, size_t, count)
+#include <gollumix/unistd.h>
 
 int main(void) {
     int fd, res;
@@ -24,6 +10,7 @@ int main(void) {
 
     if (fd < 0) {
         print("PRG4: cannot open the tty3 terminal.\n");
+        return 0;
     }
 
     for (;;) {
@@ -47,8 +34,8 @@ int main(void) {
 
     if (res < 0) {
         print("PRG4: cannot close tty3.\n");
+        return 0;
     }
 
-    for(;;);
     return 0;
 }

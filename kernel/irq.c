@@ -4,9 +4,8 @@
  * Copyright (C) 2003 Open Community
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
-
-#include "io.h"
-#include "system.h"
+#include <asm/io.h>
+#include <asm/system.h>
 
 #define is_valid_irq(n) (n>=0 && n<16)
 

@@ -1,10 +1,14 @@
-/* vsprintf.c -- Lars Wirzenius & Linus Torvalds. */
 /*
- * Wirzenius wrote this portably, Torvalds fucked it up :-)
+ * keyboard.c
+ *
+ * Copyright (C) 2003 Open Community
+ * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
 
-#include "stdarg.h"
-#include "string.h"
+// vsprintf.c -- Lars Wirzenius & Linus Torvalds.
+// Wirzenius wrote this portably, Torvalds fucked it up :-)
+#include <gollumix/stdarg.h>
+#include <asm/string.h>
 
 /* we use this so that we can do without the ctype library */
 #define is_digit(c)	((c) >= '0' && (c) <= '9')

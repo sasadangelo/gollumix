@@ -1,5 +1,11 @@
-#include "tty_queue.h"
-#include "sched.h"
+/*
+ * tty_queue.c
+ *
+ * Copyright (C) 2003 Open Community
+ * author Salvatore D'Angelo (koala.gnu@tiscali.it)
+ */
+#include <gollumix/tty_queue.h>
+#include <gollumix/sched.h>
 
 //-----------------------------------------------------------------------------
 // PUBLIC functions

@@ -1,11 +1,17 @@
-#include "kernel.h"
-#include "types.h"
-#include "stddef.h"
-#include "limits.h"
-#include "sched.h"
-#include "errno.h"
-#include "string.h"
-#include "uaccess.h"
+/*
+ * fs.c
+ *
+ * Copyright (C) 2003 Open Community
+ * author Salvatore D'Angelo (koala.gnu@tiscali.it)
+ */
+#include <gollumix/kernel.h>
+#include <gollumix/types.h>
+#include <gollumix/stddef.h>
+#include <gollumix/limits.h>
+#include <gollumix/sched.h>
+#include <gollumix/errno.h>
+#include <asm/string.h>
+#include <asm/uaccess.h>
 
 struct file file_table[NR_FILE];
 

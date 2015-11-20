@@ -4,11 +4,10 @@
  * Copyright (C) 2003 Open Community
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
-
-#include "kernel.h"
-#include "kernel_map.h"
-#include "mm.h"
-#include "stddef.h"
+#include <gollumix/kernel.h>
+#include <gollumix/kernel_map.h>
+#include <gollumix/mm.h>
+#include <gollumix/stddef.h>
 
 #define BITS_PER_BYTE 8
 #define MEM_INIT      K_END

@@ -1,7 +1,7 @@
 #ifndef SERIAL_H
 #define SERIAL_H
 
-#include "tty.h"
+#include <gollumix/tty.h>
 
 #define RS_QUEUE_MAX    4096
 #define N_SERIALS       2

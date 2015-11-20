@@ -8,7 +8,7 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#include "segment.h"
+#include <gollumix/segment.h>
 
 #define save_flags(x) \
     __asm__ __volatile__("pushfl ; popl %0":"=g" (x): /* no input */)

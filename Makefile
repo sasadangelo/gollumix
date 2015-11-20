@@ -1,71 +1,41 @@
+TOPDIR=$(CURDIR)
+DIRNAME =`basename $(TOPDIR)`
+FUNNYDIR=
+RULES=$(TOPDIR)/Rules.make
+
 AS=as
 LD=ld 
 CC=gcc
 CPP=gcc -E
-LDS= kernel.lds
-OBJCOPY=objcopy -O binary -R .note -R .comment -S
-MAPFILE = System.map
-
-#Select one of these two option if you want compile in debug or not debug mode
-DEBUG =
-#DEBUG = -DDEBUG
+MAKE=make -s
 
 # Please select your keyboard map
 #KEYBOARD = -DKBD_US
 KEYBOARD = -DKBD_IT
 
-KERNEL_OBJ=head.o main.o tty.o keyboard.o console.o asm.o vsprintf.o irq.o \
-	traps.o time.o mktime.o sched.o sys.o mm.o panic.o errno.o fork.o exec.o \
-	usercopy.o serial.o fs.o tty_queue.o task.o wait_queue.o
+#Select one of these two option if you want compile in debug or not debug mode
+DEBUG =
+#DEBUG = -DDEBUG
+
+CPPFLAGS=-I$(TOPDIR)/include
+CFLAGS=$(CPPFLAGS) $(KEYBOARD) $(DEBUG) -c -Wall -I. -nostdinc -O -fomit-frame-pointer
+
+export TOPDIR FUNNYDIR RULES LD CC CPP MAKE KEYBOARD CPPFLAGS CFLAGS
+
+SUB_DIRS=boot fs drivers kernel procs tools
+
+.PHONY: gollumix image
+
+include $(RULES)
 
 all: image
 
-bootsect: bootsect.o
-	$(LD) -Ttext 0x0 -s --oformat binary -o $@ $<
-
-bootsect.o: bootsect.s
-	$(AS) -o $@ $<
-
-%.s: %.S
-	$(CPP) -traditional $< -o $@
-
-setup: setup.o
-	$(LD) -Ttext 0x0 -s --oformat binary -o $@ $<
-
-setup.o: setup.s
-	$(AS) -o $@ $<
-
-kernel: kernel.elf
-	$(OBJCOPY) $< $@
-
-kernel.elf: $(KERNEL_OBJ) $(LDS)
-	$(LD) -e stext -T $(LDS) -o $@ $(KERNEL_OBJ)
-	nm $@ | grep -v '\(compiled\)\|\(\.o$$\)\|\( [aU] \)\|\(\.\.ng$$\)\|\(LASH[RL]DI\)' | sort > $(MAPFILE)
-
-$(LDS):
-	$(CPP) -nostdinc -P -C -Ui386 -o $@ $@.S
-
-head.o: head.s
-	$(AS) -o $@ $<
-
-.c.o:
-	$(CC) $(KEYBOARD) $(DEBUG) -I. -nostdinc -Wall -O -fomit-frame-pointer -c $< -o  $@
-
-asm.o: asm.S
-	gcc -c -o $@ $<
-
-disk: image
+disk: do_it_all
 	dd if=image of=/dev/fd0 bs=512
 
-image: kernel bootsect setup ./tools/build proc_1.bin proc_2.bin proc_3.bin proc_4.bin proc_5.bin proc_6.bin
-	./tools/build bootsect setup kernel 6 proc_1.bin proc_2.bin proc_3.bin proc_4.bin proc_5.bin proc_6.bin
+image: 
+	@echo "[KERNEL IMAGE]"
+	@./tools/build boot/bootsect boot/setup kernel/kernel 6 procs/proc_?.bin
 
-./tools/build: ./tools/build.c
-	$(CC) -o ./tools/build ./tools/build.c
-
-%.bin: %.o errno.o syscall.o
-	$(LD) -T proc.lds -o $@ $< errno.o syscall.o
-
-clean:
-	rm -f *.o *.s kernel.lds *.bin
-	rm -rf bootsect setup kernel kernel.elf image ./tools/build System.map
+local_clean:
+	@rm -f image

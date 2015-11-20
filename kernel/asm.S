@@ -4,9 +4,9 @@
  * Copyright (C) 2003 Open Community
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
-#include "linkage.h"
-#include "sys.h"
-#include "segment.h"
+#include <asm/linkage.h>
+#include <gollumix/sys.h>
+#include <gollumix/segment.h>
 
 .extern unhand_int
 .extern IRQ_TABLE

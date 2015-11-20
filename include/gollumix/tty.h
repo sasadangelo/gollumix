@@ -7,7 +7,7 @@
 #ifndef TTY_H
 #define TTY_H
 
-#include "tty_queue.h"
+#include <gollumix/tty_queue.h>
 
 #define TTY_WRITE_BUSY 1
 #define TTY_READ_BUSY  2

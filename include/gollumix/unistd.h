@@ -8,8 +8,8 @@
 #ifndef UNISTD_H
 #define UNISTD_H
 
-#include "types.h"
-#include "stddef.h"
+#include <gollumix/types.h>
+#include <gollumix/stddef.h>
 
 // the syscall index in the syscall table.
 #define __NR_print  0
@@ -21,7 +21,7 @@
 #define __NR_write  6
 
 #define _syscall0(type,name) \
-extern inline type name(void) \
+type name(void) \
 { \
 type __res; \
 __asm__ volatile ("int $0x80" \
@@ -34,7 +34,7 @@ __asm__ volatile ("int $0x80" \
 }
 
 #define _syscall1(type,name,atype,a) \
-extern inline type name(atype a) \
+type name(atype a) \
 { \
 type __res; \
 __asm__ volatile ("int $0x80" \
@@ -61,12 +61,12 @@ __asm__ volatile ("int $0x80" \
 extern int errno;
 
 // the signature of the supported system call
-int print(char *msg);
-int fork(void);
-int exec(char *filename);
-int open(const char *pathname);
-int close(int fd);
-ssize_t read (int fd, char *buf, size_t count);
-ssize_t write(int fd, char *buf, size_t count);
+extern int print(char *msg);
+extern int fork(void);
+extern int exec(char *filename);
+extern int open(const char *pathname);
+extern int close(int fd);
+extern ssize_t read (int fd, char *buf, size_t count);
+extern ssize_t write(int fd, char *buf, size_t count);
 
 #endif

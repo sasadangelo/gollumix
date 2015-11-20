@@ -4,8 +4,8 @@
  * Copyright (C) 2003 Open Community
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
-#include "tasks.h"
-#include "segment.h"
+#include <gollumix/tasks.h>
+#include <gollumix/segment.h>
 
 INIT_STACK = 0x94000-0x0C
 

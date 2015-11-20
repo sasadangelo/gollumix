@@ -4,8 +4,7 @@
  * Copyright (C) 2003 Open Community
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
-
-#include "config.h"
+#include <gollumix/config.h>
 
 SETUPSECTS = 4
 BOOTSEG    = 0x07C0
@@ -249,7 +248,7 @@ rp_read:
     add %cx, %ax                # AX = kernel bytes read
     cmpw    syssize, %ax        # if (all bytes have been read)
                                 #       jump ok1_read -> need to read
-                                # else
+                                # otherwise
                                 #       stop reading. You have finished.
     jbe ok1_read
     ret

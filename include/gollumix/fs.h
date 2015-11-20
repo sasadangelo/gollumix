@@ -1,7 +1,7 @@
 #ifndef FS_H
 #define FS_H
 
-#include "types.h"
+#include <gollumix/types.h>
 
 // only 1 char driver: tty
 #define MAX_CHRDEV 1

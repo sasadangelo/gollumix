@@ -1,7 +1,13 @@
-#include "system.h"
-#include "kernel.h"
-#include "stddef.h"
-#include "wait_queue.h"
+/*
+ * wait_queue.c
+ *
+ * Copyright (C) 2003 Open Community
+ * author Salvatore D'Angelo (koala.gnu@tiscali.it)
+ */
+#include <asm/system.h>
+#include <gollumix/kernel.h>
+#include <gollumix/stddef.h>
+#include <gollumix/wait_queue.h>
 
 void add_wait_queue(struct wait_queue *queue, struct wait_entry *entry) {
     unsigned long flags;

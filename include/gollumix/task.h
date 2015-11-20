@@ -8,10 +8,10 @@
 #ifndef TASK_H
 #define TASK_H
 
-#include "system.h"
-#include "tasks.h"
-#include "fs.h"
-#include "wait_queue.h"
+#include <asm/system.h>
+#include <gollumix/tasks.h>
+#include <gollumix/fs.h>
+#include <gollumix/wait_queue.h>
 
 // task states
 #define TASK_RUNNING         0

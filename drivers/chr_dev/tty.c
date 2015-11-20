@@ -4,14 +4,14 @@
  * Copyright (C) 2003 Open Community
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
-#include "system.h"
-#include "serial.h"
-#include "console.h"
-#include "fs.h"
-#include "sched.h"
-#include "kernel.h"
-#include "stddef.h"
-#include "uaccess.h"
+#include <asm/system.h>
+#include <gollumix/serial.h>
+#include <gollumix/console.h>
+#include <gollumix/fs.h>
+#include <gollumix/sched.h>
+#include <gollumix/kernel.h>
+#include <gollumix/stddef.h>
+#include <asm/uaccess.h>
 
 #define N_TTYS          N_CONSOLES+N_SERIALS
 #define IS_VALID_TTY(n) ((n) >= 1 && (n) <= N_TTYS)

@@ -1,7 +1,13 @@
-#include "task.h"
-#include "kernel.h"
-#include "stddef.h"
-#include "sched.h"
+/*
+ * task.c
+ *
+ * Copyright (C) 2003 Open Community
+ * author Salvatore D'Angelo (koala.gnu@tiscali.it)
+ */
+#include <gollumix/task.h>
+#include <gollumix/kernel.h>
+#include <gollumix/stddef.h>
+#include <gollumix/sched.h>
 
 // the current task
 struct task_struct *current;

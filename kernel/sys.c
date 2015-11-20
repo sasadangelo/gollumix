@@ -4,11 +4,10 @@
  * Copyright (C) 2003 Open Community
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
-
-#include "kernel.h"
-#include "sys.h"
-#include "unistd.h"
-#include "ptrace.h"
+#include <gollumix/kernel.h>
+#include <gollumix/sys.h>
+#include <gollumix/unistd.h>
+#include <gollumix/ptrace.h>
 
 /*
  * For this step only this system call is supported for debug purpose.

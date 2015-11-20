@@ -4,14 +4,13 @@
  * Copyright (C) 2003 Open Community
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
-
-#include "io.h"
-#include "system.h"
-#include "kernel.h"
-#include "keymap.h"
-#include "irq.h"
-#include "tty.h"
-#include "string.h"
+#include <asm/io.h>
+#include <asm/system.h>
+#include <gollumix/kernel.h>
+#include <gollumix/keymap.h>
+#include <gollumix/irq.h>
+#include <gollumix/tty.h>
+#include <asm/string.h>
 
 #define LSHIFT   0x01
 #define RSHIFT   0x02

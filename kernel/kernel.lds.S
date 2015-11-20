@@ -1,4 +1,4 @@
-#include "config.h"
+#include <gollumix/config.h>
 
 OUTPUT_FORMAT("elf32-i386", "elf32-i386", "elf32-i386")
 OUTPUT_ARCH(i386)

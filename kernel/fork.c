@@ -1,12 +1,19 @@
-#include "kernel.h"
-#include "sched.h"
-#include "mm.h"
-#include "stddef.h"
-#include "errno.h"
-#include "segment.h"
-#include "ptrace.h"
-#include "types.h"
-#include "string.h"
+/*
+ * Copyright (C) Open Community
+ * author Salvatore D'Angelo (koala.gnu@tiscali.it)
+ *
+ * This code simulates an exec system call. It should be remove when this
+ * kernel will support real filesystems.
+ */
+#include <gollumix/kernel.h>
+#include <gollumix/sched.h>
+#include <gollumix/mm.h>
+#include <gollumix/stddef.h>
+#include <gollumix/errno.h>
+#include <gollumix/segment.h>
+#include <gollumix/ptrace.h>
+#include <gollumix/types.h>
+#include <asm/string.h>
 
 int find_empty_process(void) {
     int nr;

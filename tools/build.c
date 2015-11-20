@@ -22,8 +22,8 @@
 #include <stdarg.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include "../vfs.h"
-#include "../kernel_map.h"
+#include <gollumix/vfs.h>
+#include <gollumix/kernel_map.h>
 
 #define DEFAULT_MAJOR_ROOT 0
 #define DEFAULT_MINOR_ROOT 0
@@ -66,7 +66,7 @@ int file_read(const char *name, const int size) {
     FILE *in;
     int n;
 
-    msg_print("Reading %s... ", name);
+    msg_print("Reading %s ... ", name);
 
     if (buf_ptr+size > buf_end) {
         die("build: not enough space to load %s", name);
@@ -92,7 +92,7 @@ int file_read(const char *name, const int size) {
         die("build: size error for %s", name);
     }
 
-    msg_print("ok!\n");
+    msg_print("ok! (%d bytes read)\n", n);
     return n;
 }
 
@@ -130,8 +130,8 @@ int main(int argc, char ** argv) {
 
     num_procs = atoi(argv[4]);
 
-    msg_print("Root device is (%d, %d)\n", DEFAULT_MAJOR_ROOT, 
-                                           DEFAULT_MINOR_ROOT);
+    msg_print("\nRoot device is (%d, %d)\n\n", DEFAULT_MAJOR_ROOT, 
+                                               DEFAULT_MINOR_ROOT);
 
     ///////////////////////////////////////////////////////////////////////////
     // READ BOOTSECT
@@ -174,7 +174,6 @@ int main(int argc, char ** argv) {
     //
     // read the system code and then print it on stdout.
     ksize = file_read(argv[3], 0);
-    msg_print("System is %d bytes, %.1f Kb\n", ksize, (float)ksize/1024);
 
     if (((ksize + 15) / 16) > DEF_SYSSIZE) {
         die("build: the kernel is too big");
@@ -206,16 +205,13 @@ int main(int argc, char ** argv) {
         ksize += proc_size;
         sprintf(vfs_h->node[i].name, "PRG%d", i+1);
         vfs_h->node[i].size = proc_size;
-
-        msg_print("Added process: %s, size: %d\n", vfs_h->node[i].name,
-                                                   vfs_h->node[i].size);
     }
 
     if (ksize > K_MAX_SIZE) {
         die("build: kernel+processes exceed max size allowed");
     }
 
-    msg_print("Kernel image (+tasks) %d bytes, %.1f Kb, %.1f%%\n",
+    msg_print("\nKernel (+tasks) %d bytes, %.1f Kb, %.1f%%\n\n",
               ksize, (float)ksize/1024, (float)(ksize*100/K_MAX_SIZE));
 
     // convert sys_size in 16 byte clicks and write in the boot sector.

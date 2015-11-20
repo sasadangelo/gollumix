@@ -4,15 +4,14 @@
  * Copyright (C) 2003 Open Community
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
-
-#include "types.h"
-#include "stddef.h"
-#include "time.h"
-#include "sched.h"
-#include "mm.h"
-#include "kernel.h"
-#include "string.h"
-#include "kernel_map.h"
+#include <gollumix/types.h>
+#include <gollumix/stddef.h>
+#include <gollumix/time.h>
+#include <gollumix/sched.h>
+#include <gollumix/mm.h>
+#include <gollumix/kernel.h>
+#include <asm/string.h>
+#include <gollumix/kernel_map.h>
 
 #define is_valid_task(pid) ((pid)>0 && (pid)<NR_TASKS && task[pid])
 

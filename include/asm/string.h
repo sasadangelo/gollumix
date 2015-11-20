@@ -1,7 +1,7 @@
 #ifndef STRING_H
 #define STRING_H
 
-#include "stddef.h"
+#include <gollumix/stddef.h>
 
 /*
  * This string-include defines all string functions as inline

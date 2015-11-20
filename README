@@ -1,6 +1,2 @@
-Add the support for exception handling. Basically if an exception occurs,
-the CS and EIP register must be printed and the number of Exception.
-The build process should produce a System map that will be used to map
-CS:EIP with a kernel routine. 
-This will be very useful for debug purpose, to understand where the exception
-occured in the code.
+Improve build process. First of all, organize the code by directories.
+Then change the build process to support the new structure.

@@ -1,7 +1,7 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-#include "tty.h"
+#include <gollumix/tty.h>
 
 #define N_CONSOLES          6
 

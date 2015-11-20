@@ -1,18 +1,4 @@
-int main(void);
-
-void _start(void) {  // offset 0x0
-    main();
-    for(;;);
-}
-
-#include "unistd.h"
-
-_syscall1(int, print, char*, msg)
-_syscall0(int, fork)
-_syscall1(int, open, const char*, pathname)
-_syscall1(int, close, int, fd)
-_syscall3(ssize_t, read,  int, fd, char *, buf, size_t, count)
-_syscall3(ssize_t, write, int, fd, char *, buf, size_t, count)
+#include <gollumix/unistd.h>
 
 static int tty_COM2() {
     int  fd_rs, fd_tty, res;

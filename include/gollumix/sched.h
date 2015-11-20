@@ -1,8 +1,8 @@
 #ifndef SCHED_H
 #define SCHED_H
 
-#include "task.h"
-#include "system.h"
+#include <gollumix/task.h>
+#include <asm/system.h>
 
 #define HZ 100
 

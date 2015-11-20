@@ -1,12 +1,10 @@
 /*
- * kernel.h
+ * usercopy.c
  *
  * Copyright (C) 2003 Open Community
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
-
-//#include "kernel.h"
-#include "uaccess.h"
+#include <asm/uaccess.h>
 
 /*
  * This routine copy a null terminated string from user space to kernel

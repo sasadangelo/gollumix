@@ -4,19 +4,18 @@
  * Copyright (C) 2003 Open Community
  * author Salvatore D'Angelo (koala.gnu@tiscali.it)
  */
+#include <gollumix/tty.h>
+#include <asm/system.h>
+#include <gollumix/kernel.h>
+#include <gollumix/kernel_map.h>
+#include <gollumix/sched.h>
+#include <gollumix/unistd.h>
+#include <gollumix/serial.h>
+#include <gollumix/console.h>
 
-#include "tty.h"
-#include "system.h"
-#include "kernel.h"
-#include "kernel_map.h"
-#include "sched.h"
-#include "unistd.h"
-#include "serial.h"
-#include "console.h"
-
-_syscall1(int, print, char*, msg)
-_syscall0(int, fork)
-_syscall1(int, exec, char*, name)
+extern inline _syscall1(int, print, char*, msg)
+extern inline _syscall0(int, fork)
+extern inline _syscall1(int, exec, char*, name)
 
 extern void init_traps(void);
 extern void init_irq(void);
@@ -31,7 +30,9 @@ extern char __KERNEL_END__;
  * function is called.
  */
 void start_kernel(void) {
-    int pid;
+    int pid, i;
+    char *names[N_CONSOLES] = { "PRG1", "PRG2", "PRG3", 
+                                "PRG4", "PRG5", "PRG6" };
 
     // init traps
     init_traps();
@@ -54,61 +55,19 @@ void start_kernel(void) {
     // switch in user mode
     move_to_user_mode();
 
-    // spawn process 1 and run PRG1
-    pid = fork();
+    // for a process for each console and execute the program PRGi
+    for (i=0; i<N_CONSOLES; ++i) {
+        // spawn process i and run PRG1
+        pid = fork();
 
-    if (pid == 0) {
-        exec("PRG1");
-    } else if (pid < 0) {
-        print("idle: cannot duplicate myself.\n");
+        if (pid == 0) {
+            exec(names[i]);
+        } else if (pid < 0) {
+            print("idle: cannot duplicate myself.\n");
+        }
     }
-
-    // spawn process 2 and run PRG2
-    pid = fork();
-
-    if (pid == 0) {
-        exec("PRG2");
-    } else if (pid < 0) {
-        print("idle: cannot duplicate myself.\n");
-    }
-
-    // spawn process 3 and run PRG3
-    pid = fork();
-
-    if (pid == 0) {
-        exec("PRG3");
-    } else if (pid < 0) {
-        print("idle: cannot duplicate myself.\n");
-    }
-
-    // spawn process 4 and run PRG4
-    pid = fork();
-
-    if (pid == 0) {
-        exec("PRG4");
-    } else if (pid < 0) {
-        print("idle: cannot duplicate myself.\n");
-    }   
-
-    // spawn process 5 and run PRG5
-    pid = fork();
-
-    if (pid == 0) {
-        exec("PRG5");
-    } else if (pid < 0) {
-        print("idle: cannot duplicate myself.\n");
-    }
-
-    // spawn process 6 and run PRG6
-    pid = fork();
-
-    if (pid == 0) {
-        exec("PRG6");
-    } else if (pid < 0) {
-        print("idle: cannot duplicate myself.\n");
-    }
-
-    print("Idle: ok!.\n");
+    
+	print("Idle: ok!\n");
 
     // idle loop
     while(1);
