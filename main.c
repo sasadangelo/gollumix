@@ -92,6 +92,33 @@ void start_kernel(void) {
         print("idle: cannot duplicate myself.\n");
     }
 
+    // spawn process 2 and run PRG2
+    pid = fork();
+
+    if (pid == 0) {
+        exec("PRG2");
+    } else if (pid < 0) {
+        print("idle: cannot duplicate myself.\n");
+    }
+
+    // spawn process 3 and run PRG3
+    pid = fork();
+
+    if (pid == 0) {
+        exec("PRG3");
+    } else if (pid < 0) {
+        print("idle: cannot duplicate myself.\n");
+    }
+
+    // spawn process 4 and run PRG4
+    pid = fork();
+
+    if (pid == 0) {
+        exec("PRG4");
+    } else if (pid < 0) {
+        print("idle: cannot duplicate myself.\n");
+    }   
+
     print("idle task is running.\n");
 
     // idle loop

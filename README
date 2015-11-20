@@ -1,1 +1,1 @@
-Implement write system call for terminals.
+Add three processes to handle the console 2, 3 and 4.

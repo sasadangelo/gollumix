@@ -51,8 +51,8 @@ asm.o: asm.S
 disk: image
 	dd if=image of=/dev/fd0 bs=512
 
-image: kernel bootsect setup ./tools/build proc_1.bin
-	./tools/build bootsect setup kernel 1 proc_1.bin > image
+image: kernel bootsect setup ./tools/build proc_1.bin proc_2.bin proc_3.bin proc_4.bin
+	./tools/build bootsect setup kernel 4 proc_1.bin proc_2.bin proc_3.bin proc_4.bin > image
 
 ./tools/build: ./tools/build.c
 	$(CC) -o ./tools/build ./tools/build.c
