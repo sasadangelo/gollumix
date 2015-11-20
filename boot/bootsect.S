@@ -496,10 +496,15 @@ sectors:    .word 18        # sectors = 18
 msg1:       .byte 13, 10
             .ascii "Loading system "
 
-.org 507						# Last 5 bytes of the boot sector.
+.org 497
 
 # The value in setup_sects and syssize will be replace in the build.c utility.
 # Please see the tools/build.c.
-setup_sects:    .byte SETUPSECTS
-syssize:        .word SYSSIZE
-boot_flag:		.word 0xAA55	# Flag indicating a boot disk
+setup_sects: .byte SETUPSECTS
+root_flags:  .word 1        # root read-only
+syssize:     .word SYSSIZE
+swap_dev:    .word 0
+ram_size:    .word 0
+vid_mode:    .word 0
+root_dev:    .word 0
+boot_flag:   .word 0xAA55   # Flag indicating a boot disk

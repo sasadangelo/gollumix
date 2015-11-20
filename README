@@ -1,2 +1,4 @@
-Improve build process. First of all, organize the code by directories.
-Then change the build process to support the new structure.
+In this step we change the boot process (in particolar bootsect.S) in order
+to be able to boot our kernel with a boot loader like LILO.
+Basically we change the last byte of the boot sector according to the
+LILO/GRUB BOOT protocol (see /usr/src/linux/Documentation/i386/boot.txt).

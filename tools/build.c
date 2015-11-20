@@ -217,8 +217,8 @@ int main(int argc, char ** argv) {
     // convert sys_size in 16 byte clicks and write in the boot sector.
     ksize = (ksize + 15) / 16;
 
-    buffer[508] = (char)(ksize & 0xFF);
-    buffer[509] = (char)((ksize >> 8) & 0xFF);
+    buffer[500] = (char)(ksize & 0xFF);
+    buffer[501] = (char)((ksize >> 8) & 0xFF);
 
     ///////////////////////////////////////////////////////////////////////////
     // WRITE IMAGE on DISK
