@@ -14,6 +14,7 @@ typedef unsigned int    u_int;
 typedef unsigned long   u_long;
 typedef int             ssize_t;
 typedef unsigned short  dev_t;
+typedef long            off_t;
 
 typedef enum {false = 0, true = 1 } bool;
 

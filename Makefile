@@ -18,7 +18,7 @@ DEBUG =
 #DEBUG = -DDEBUG
 
 CPPFLAGS=-I$(TOPDIR)/include
-CFLAGS=$(CPPFLAGS) $(KEYBOARD) $(DEBUG) -c -Wall -I. -nostdinc -O -fomit-frame-pointer
+CFLAGS=$(CPPFLAGS) $(KEYBOARD) $(DEBUG) -c -Wall -Wstrict-prototypes -I. -nostdinc -O -fomit-frame-pointer -fno-common -fno-builtin
 
 export TOPDIR FUNNYDIR RULES LD CC CPP MAKE KEYBOARD CPPFLAGS CFLAGS
 
@@ -31,9 +31,10 @@ include $(RULES)
 all: image
 
 disk: do_it_all
-	dd if=image of=/dev/fd0 bs=512
+	@echo "[DISK]"
+	@dd if=image of=/dev/fd0 bs=512
 
-image: 
+image: kernel/kernel
 	@echo "[KERNEL IMAGE]"
 	@./tools/build boot/bootsect boot/setup kernel/kernel 6 procs/proc_?.bin
 

@@ -12,6 +12,7 @@
 #include <gollumix/tasks.h>
 #include <gollumix/fs.h>
 #include <gollumix/wait_queue.h>
+#include <gollumix/mm.h>
 
 // task states
 #define TASK_RUNNING         0
@@ -124,6 +125,13 @@ struct task_struct {
      { NULL, } \
     }
 
+union task_union {
+    struct task_struct task;
+    char stack[PAGE_SIZE];
+};
+
+// the idle task
+extern union task_union init_task;
 // the current task
 extern struct task_struct *current;
 // the tasks table

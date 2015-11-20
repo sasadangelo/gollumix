@@ -24,4 +24,5 @@ extern asmlinkage ssize_t sys_write(int fd, void *buf, size_t count);
  * The system call table
  */
 void *sys_call_table[NR_SYSCALLS] = 
-    { sys_print, sys_fork, sys_exec, sys_open, sys_close, sys_read, sys_write };
+    { sys_print, sys_fork, sys_exec, sys_open, sys_close, sys_read, 
+      sys_write };

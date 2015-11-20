@@ -9,10 +9,15 @@
 #include <gollumix/stddef.h>
 #include <gollumix/sched.h>
 
+union task_union init_task = {INIT_TASK, };
+
 // the current task
-struct task_struct *current;
+//struct task_struct *current;
+struct task_struct *current = &(init_task.task);
+
 // the tasks table
-struct task_struct *task[NR_TASKS];
+//struct task_struct *task[NR_TASKS];
+struct task_struct *task[NR_TASKS] = {&(init_task.task), };
 
 // wake up a task sleeping in interruptible state
 void wake_up(struct wait_queue *queue) {

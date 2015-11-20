@@ -100,5 +100,24 @@ __asm__ __volatile__(
     :"1" (cs),"2" (ct));
     return __res;
 }
-
+/*
+static inline void memcpy_tofs(void * to, void * from, unsigned long n)
+{
+__asm__("cld\n\t"
+    "push %%es\n\t"
+    "push %%fs\n\t"
+    "pop %%es\n\t"
+    "testb $1,%%cl\n\t"
+    "je 1f\n\t"
+    "movsb\n"
+    "1:\ttestb $2,%%cl\n\t"
+    "je 2f\n\t"
+    "movsw\n"
+    "2:\tshrl $2,%%ecx\n\t"
+    "rep ; movsl\n\t"
+    "pop %%es"
+    ::"c" (n),"D" ((long) to),"S" ((long) from)
+    :"cx","di","si");
+}
+*/
 #endif

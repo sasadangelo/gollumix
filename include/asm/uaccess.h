@@ -14,4 +14,6 @@ extern inline void put_user_byte(char val,char *addr) {
 
 extern long strncpy_from_user(char *dst, const char *src, long count);
 
+extern long copy_to_user(char *dst, const char *src, long count);
+
 #endif

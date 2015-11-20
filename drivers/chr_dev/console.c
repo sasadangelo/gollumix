@@ -233,13 +233,17 @@ void con_switch(int n) {
     }
 }
 
-
 // A simple implementation of a debug system call
 asmlinkage int sys_print(char *msg) {
     char str[MAX_USER_MSG+1];
 
     strncpy_from_user(str, msg, sizeof(str));
 	printk("%s", str);
+    return 0;
+}
+
+asmlinkage int sys_print_hex(unsigned char value) {
+    printk("%x", value);
     return 0;
 }
 

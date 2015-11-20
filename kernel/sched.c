@@ -12,24 +12,25 @@
 #include <gollumix/kernel.h>
 #include <asm/string.h>
 #include <gollumix/kernel_map.h>
+#include <gollumix/task.h>
 
 #define is_valid_task(pid) ((pid)>0 && (pid)<NR_TASKS && task[pid])
 
 volatile struct timeval xtime;
 
-union task_union {
-    struct task_struct task;
-    char stack[PAGE_SIZE];
-};
+//union task_union {
+//    struct task_struct task;
+//    char stack[PAGE_SIZE];
+//};
 
 // The init task
-union task_union init_task = {INIT_TASK, };
+//union task_union init_task = {INIT_TASK, };
 
 // The process table
-struct task_struct *task[NR_TASKS] = {&(init_task.task), };
+//struct task_struct *task[NR_TASKS] = {&(init_task.task), };
 
 // The current task
-struct task_struct *current = &(init_task.task);
+//struct task_struct *current = &(init_task.task);
 
 /*
  * This is the scheduling routine. The kernel calls this routine each time

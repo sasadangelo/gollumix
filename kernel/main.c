@@ -6,12 +6,15 @@
  */
 #include <gollumix/tty.h>
 #include <asm/system.h>
+#include <asm/io.h>
 #include <gollumix/kernel.h>
 #include <gollumix/kernel_map.h>
 #include <gollumix/sched.h>
 #include <gollumix/unistd.h>
 #include <gollumix/serial.h>
 #include <gollumix/console.h>
+#include <gollumix/floppy.h>
+#include <gollumix/delay.h>
 
 extern inline _syscall1(int, print, char*, msg)
 extern inline _syscall0(int, fork)
@@ -49,8 +52,12 @@ void start_kernel(void) {
 
     printk("Kernel info: %u bytes, start at 0x%x0 end at 0x%x0.\n",
            &__KERNEL_END__-K_START, K_START, &__KERNEL_END__);
-
     sti();
+
+    // calibrate delay
+    calibrate_delay();
+    // floppy driver initialization
+    floppy_init();
 
     // switch in user mode
     move_to_user_mode();
@@ -66,7 +73,7 @@ void start_kernel(void) {
             print("idle: cannot duplicate myself.\n");
         }
     }
-    
+
 	print("Idle: ok!\n");
 
     // idle loop

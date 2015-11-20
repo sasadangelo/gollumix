@@ -7,37 +7,45 @@
 
 // vsprintf.c -- Lars Wirzenius & Linus Torvalds.
 // Wirzenius wrote this portably, Torvalds fucked it up :-)
+
 #include <gollumix/stdarg.h>
 #include <asm/string.h>
 
-/* we use this so that we can do without the ctype library */
+// we use this so that we can do without the ctype library
 #define is_digit(c)	((c) >= '0' && (c) <= '9')
 
-static int skip_atoi(const char **s)
-{
+static int skip_atoi(const char **s) {
 	int i=0;
 
 	while (is_digit(**s))
 		i = i*10 + *((*s)++) - '0';
+
 	return i;
 }
 
-#define ZEROPAD	1		/* pad with zero */
-#define SIGN	2		/* unsigned/signed long */
-#define PLUS	4		/* show plus */
-#define SPACE	8		/* space if plus */
-#define LEFT	16		/* left justified */
-#define SPECIAL	32		/* 0x */
-#define SMALL	64		/* use 'abcdef' instead of 'ABCDEF' */
+// pad with zero
+#define ZEROPAD 1
+// unsigned/signed long
+#define SIGN	2
+// show plus
+#define PLUS	4
+// space if plus
+#define SPACE	8
+// left justified
+#define LEFT	16
+// 0x
+#define SPECIAL	32
+// use 'abcdef' instead of 'ABCDEF'
+#define SMALL	64
 
 #define do_div(n,base) ({ \
 int __res; \
 __asm__("divl %4":"=a" (n),"=d" (__res):"0" (n),"1" (0),"r" (base)); \
 __res; })
 
-static char * number(char * str, int num, int base, int size, int precision
-	,int type)
-{
+static char *number(char * str, int num, int base, int size, 
+                    int precision, int type) {
+
 	char c,sign,tmp[36];
 	const char *digits="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	int i;
@@ -93,7 +101,7 @@ static char * number(char * str, int num, int base, int size, int precision
 	return str;
 }
 
-int vsprintf(char *buf, const char *fmt, va_list args) {
+static int vsprintf(char *buf, const char *fmt, va_list args) {
 
 	int len;
 	int i;
@@ -101,7 +109,7 @@ int vsprintf(char *buf, const char *fmt, va_list args) {
 	char *s;
 	int *ip;
 
-	int flags;		// flags to number()
+	int flags;		    // flags to number()
 
 	int field_width;	// width of output field
 	int precision;		// min. # of digits for integers; max
@@ -237,7 +245,7 @@ int vsprintf(char *buf, const char *fmt, va_list args) {
 
 }
 
-
+/*
 int sprintf(char *buf, const char *fmt, ...)
 {
 	va_list args;
@@ -249,3 +257,19 @@ int sprintf(char *buf, const char *fmt, ...)
 
 	return len;
 }
+*/
+
+#include <gollumix/unistd.h>
+static char buf[1024];
+
+int printf(const char *fmt, ...) {
+    va_list args;
+    int len;
+
+    va_start(args, fmt);
+    len = vsprintf(buf, fmt, args);
+    va_end(args);
+
+    return write(0, buf, len);
+}
+

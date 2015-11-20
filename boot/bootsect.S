@@ -153,7 +153,7 @@ ok_load_setup:
     movw    $SYSSEG, %ax
     movw    %ax, %es
     call read_it
-	call kill_motor         # stop the floppy motor
+#	call kill_motor         stop the floppy motor
 
 # Basically in the memory there is the following situation:
 #
@@ -406,10 +406,14 @@ bad_rt:
 # To turn off the floppy motor is necessary write 0 on the 0x3f2 I/O port.
 
 kill_motor:
-    movw    $0x3f2, %dx
-    xorb    %al, %al
-    outb    %al, %dx            # out[0x3f2] = 0
-    .word   0x00eb, 0x00eb      # perform short jmp delays
+    xorw    %ax, %ax        # reset FDC
+    xorb    %dl, %dl
+    int $0x13
+
+#    movw    $0x3f2, %dx
+#    xorb    %al, %al
+#    outb    %al, %dx            # out[0x3f2] = 0
+#    .word   0x00eb, 0x00eb      # perform short jmp delays
     ret
 
 # print_all

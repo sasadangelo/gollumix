@@ -10,12 +10,9 @@ MAPFILE = System.map
 FILESYSTEM=$(TOPDIR)/fs/fs.o
 DRIVERS=$(TOPDIR)/drivers/drivers.o
 
-#OBJ=head.o main.o tty.o keyboard.o console.o asm.o vsprintf.o irq.o \
-#	traps.o time.o mktime.o sched.o sys.o mm.o panic.o errno.o fork.o exec.o \
-#	usercopy.o serial.o tty_queue.o task.o wait_queue.o
-
 OBJ=head.o main.o asm.o vsprintf.o irq.o traps.o time.o mktime.o sched.o \
-	sys.o mm.o panic.o errno.o fork.o exec.o usercopy.o task.o wait_queue.o
+	sys.o mm.o panic.o errno.o fork.o exec.o usercopy.o task.o wait_queue.o \
+	delay.o
 
 include $(RULES)
 
@@ -25,13 +22,13 @@ kernel: kernel.elf
 	@echo "[OBJCOPY] $@"
 	@$(OBJCOPY) $< $@
 
-kernel.elf: $(OBJ) $(LDS)
+kernel.elf: $(OBJ) $(LDS) $(DRIVERS) $(FILESYSTEM)
 	@echo "[LD] $@"
 	@$(LD) -e stext -T $(LDS) -o $@ $(OBJ) $(FILESYSTEM) $(DRIVERS)
 	@nm $@ | grep -v '\(compiled\)\|\(\.o$$\)\|\( [aU] \)\|\(\.\.ng$$\)\|\(LASH[RL]DI\)' | sort > $(MAPFILE)
 
 $(LDS): $(LDS).S
-	@echo "[CPP] $@"
+	@echo "[CC] $@"
 	@$(CPP) $(CPPFLAGS) -nostdinc -P -C -Ui386 -o $@ $@.S
 
 asm.o: asm.S

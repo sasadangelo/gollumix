@@ -2,7 +2,7 @@
 # procs/libc/Makefile
 #
 
-OBJS = syscall.o errno.o
+OBJS = syscall.o errno.o printf.o
 
 include $(RULES)
 

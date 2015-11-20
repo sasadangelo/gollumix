@@ -1,21 +1,18 @@
 #include <gollumix/unistd.h>
 
-static int tty_COM2() {
-    int  fd_rs, fd_tty, res;
+extern int printf(const char *fmt, ...);
+
+static int fd_tty;
+
+static int tty_COM2(void) {
+    int fd_rs, res;
     char ch;
-
-    fd_tty = open("/dev/tty5");
-
-    if (fd_tty < 0) {
-        print("PRG6: cannot open the tty5 terminal.\n");
-        return 0;
-    }
 
     fd_rs = open("/dev/ttyS1");
 
-    if (fd_tty < 0) {
-        print("PRG6: cannot open the ttyS1 serial line.\n");
-        return 0;
+    if (fd_rs < 0) {
+        printf("PRG6: cannot open the ttyS1 serial line.\n");
+        return -1;
     }
 
     for (;;) {
@@ -23,7 +20,7 @@ static int tty_COM2() {
         res = read(fd_tty, &ch, sizeof(char));
 
         if (res < 0) {
-            print("PRG6: cannot read data from tty5.\n");
+            printf("PRG6: cannot read data from tty5.\n");
             continue;
         }
 
@@ -31,42 +28,30 @@ static int tty_COM2() {
         res = write(fd_rs, &ch, sizeof(char));
         
         if (res < 0) {
-            print("PRG6: cannot write data to ttyS1.\n");
+            printf("PRG6: cannot write data to ttyS1.\n");
             continue;
         }
-    }
-
-    res = close(fd_tty);
-
-    if (res < 0) {
-        print("PRG6: cannot close tty5.\n");
-        return 0;
     }
 
     res = close(fd_rs);
 
     if (res < 0) {
-        print("PRG6: cannot close ttyS1.\n");
-        return 0;
+        printf("PRG6: cannot close ttyS1.\n");
+        return -2;
     }
+
+    return 0;
 }
 
-static int COM2_tty() {
-    int  fd_rs, fd_tty, res;
+static int COM2_tty(void) {
+    int  fd_rs, res;
     char ch;
 
-    fd_tty = open("/dev/tty5");
-    
-	if (fd_tty < 0) {
-        print("PRG6: cannot open the tty5 terminal.\n");
-        return 0;
-    }
-    
 	fd_rs = open("/dev/ttyS1");
     
 	if (fd_rs < 0) {
-        print("PRG6: cannot open the ttyS1 serial line.\n");
-        return 0;
+        printf("PRG6: cannot open the ttyS1 serial line.\n");
+        return -3;
     }
 
     for (;;) {
@@ -74,7 +59,7 @@ static int COM2_tty() {
         res = read(fd_rs, &ch, sizeof(char));
 
 		if (res < 0) {
-            print("PRG6: cannot read data from ttyS1.\n");
+            printf("PRG6: cannot read data from ttyS1.\n");
             continue;
         }
 		
@@ -82,44 +67,51 @@ static int COM2_tty() {
         res = write(fd_tty, &ch, sizeof(char));
 
         if (res < 0) {
-            print("PRG6: cannot write data to tty.\n");
+            printf("PRG6: cannot write data to tty.\n");
             continue;
         }
 
     }
 
-    res = close(fd_tty);
-	    
-    if (res < 0) {
-        print("PRG6: cannot close tty5.\n");
-        return 0;
-    }
-
     res = close(fd_rs);
 
     if (res < 0) {
-        print("PRG6: cannot close ttyS1.\n");
-        return 0;
+        printf("PRG6: cannot close ttyS1.\n");
+        return -4;
     }
+
+    return 0;
 }
 
 int main(void) {
-    int pid;
+    int pid, res;
 
-    print("PRG6: the process PRG6 is running.\n");
+    fd_tty = open("/dev/tty5");
+
+    if (fd_tty < 0) {
+        return -5;
+    }
+
+    printf("PRG6: the process PRG6 is running.\n");
 
     pid = fork();
 
     if (pid == 0) {
         // child process: it read from COM2 and write on tty5
-        print("PRG6 child: the process PRG6 child is running.\n");
+        printf("PRG6 child: the process PRG6 child is running.\n");
         return COM2_tty();
     } else if (pid > 0) {
         // parent process: it read from tty5 and write on COM2
         return tty_COM2();
     } else {
-        print("PRG6: cannot fork child 1.\n");
-        return 0;
+        printf("PRG6: cannot fork child 1.\n");
+        return -6;
+    }
+
+    res = close(fd_tty);
+
+    if (res < 0) {
+        return -7;
     }
 
     return 0;

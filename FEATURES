@@ -1,0 +1,14 @@
+Gollumix is a full 32 bit operating system running on i386 architecture.
+
+Here the features supported:
+
+- running in 32 protected mode;
+- multitasking (support for task switch, scheduler an so on);
+- simple phisical memory manager;
+- AT keyboard (8242 controller) support;
+- RS232 serial line support;
+- a simplified TTY layer implemented (6 consoles: 4 locals and 2 serials);
+- native boot and boot loader (lilo, grub) support;
+- pic (8159 chip) support;
+- 82077AA CHMOS Floppy Driver support;
+- pit support;

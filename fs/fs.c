@@ -19,7 +19,11 @@ struct file_operations * chrdev_fops[MAX_CHRDEV] = {
     NULL,
 };
 
-static int open_tty(const char *pathname, struct file *filp);
+struct file_operations * blkdev_fops[MAX_BLKDEV] = {
+    NULL,
+};
+
+static int open_device(const char *pathname, struct file *filp);
 
 asmlinkage int sys_open(const char *pathname) {
     char kpath[PATH_MAX];
@@ -58,16 +62,17 @@ asmlinkage int sys_open(const char *pathname) {
     // copy pathname from user space to kernel space
     strncpy_from_user(kpath, pathname, PATH_MAX);
 
-    // In a true kernel open_tty should be replaced by a namei routine that
+    // In a true kernel open_device should be replaced by a namei routine that
     // convert the pathname in inode. The inode will contains the file 
 	// operation for the specific file or device.
-    if ((i = open_tty(kpath, f)) < 0) {
+    if ((i = open_device(kpath, f)) < 0) {
         current->filp[fd]=NULL;
         f->f_count=0;
         return i;
     }
 
     //f->f_count = 1;
+    f->f_pos = 0;
     //f->f_op = ..... inode ops ...;
     //current->filp[fd] = f;
 
@@ -172,27 +177,37 @@ asmlinkage ssize_t sys_write(int fd, char *buf, size_t count) {
     return -EINVAL;
 }
 
-static int open_tty(const char *pathname, struct file *filp) {
+static int open_device(const char *pathname, struct file *filp) {
     if (!strcmp(pathname, "/dev/tty0")) {
         filp->dev = 1;
+        filp->f_op = chrdev_fops[0];
     } else if (!strcmp(pathname, "/dev/tty1")) {
         filp->dev = 2;
+        filp->f_op = chrdev_fops[0];
     } else if (!strcmp(pathname, "/dev/tty2")) {
         filp->dev = 3;
+        filp->f_op = chrdev_fops[0];
     } else if (!strcmp(pathname, "/dev/tty3")) {
         filp->dev = 4;
+        filp->f_op = chrdev_fops[0];
     } else if (!strcmp(pathname, "/dev/tty4")) {
         filp->dev = 5;
+        filp->f_op = chrdev_fops[0];
     } else if (!strcmp(pathname, "/dev/tty5")) {
         filp->dev = 6;
+        filp->f_op = chrdev_fops[0];
     } else if (!strcmp(pathname, "/dev/ttyS0")) {
         filp->dev = 7;
+        filp->f_op = chrdev_fops[0];
     } else if (!strcmp(pathname, "/dev/ttyS1")) {
         filp->dev = 8;
+        filp->f_op = chrdev_fops[0];
+    } else if (!strcmp(pathname, "/dev/fd0")) {
+        filp->dev = 9;
+        filp->f_op = blkdev_fops[0];
     } else {
         return -EINVAL;
     }
 
-    filp->f_op = chrdev_fops[0];
     return 0;
 }
