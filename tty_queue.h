@@ -28,5 +28,7 @@ struct tty_queue {
 
 extern void put_queue (struct tty_queue* queue, int ch);
 extern void puts_queue(struct tty_queue* queue, char *cp);
+extern inline void putch(char c, struct tty_queue * queue);
+extern inline char getch(struct tty_queue * queue);
 
 #endif

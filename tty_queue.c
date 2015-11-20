@@ -34,3 +34,25 @@ void puts_queue(struct tty_queue* queue, char *cp) {
     // if there are processes waiting, woken up them
     wake_up(&queue->wait);
 }
+
+inline void putch(char c, struct tty_queue * queue) {
+    int head;
+
+    cli();
+    head = (queue->head + 1) & (TTY_BUF_SIZE-1);
+    if (head != queue->tail) {
+        queue->buf[queue->head] = c;
+        queue->head = head;
+    }
+    sti();
+}
+
+inline char getch(struct tty_queue * queue) {
+    char result = -1;
+
+    if (queue->tail != queue->head) {
+        result = 0xff & queue->buf[queue->tail];
+        queue->tail = (queue->tail + 1) & (TTY_BUF_SIZE-1);
+    }
+    return result;
+}

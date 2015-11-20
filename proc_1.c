@@ -16,6 +16,7 @@ _syscall3(ssize_t, write, int, fd, char *, buf, size_t, count)
 
 int main(void) {
     int fd, res;
+    char ch;
 
     print("PRG1: the process PRG1 is running.\n");
 
@@ -25,13 +26,22 @@ int main(void) {
         print("PRG1: cannot open the tty0 terminal.\n");
     }
 
-    // sleep the process
-    res = read(fd, 0, 1000);
+    char output[2];
 
-    print("PRG1: woken up.\n");
+    output[1] = '\0';
 
-    if (res < 0) {
-        print("PRG1: cannot read data from tty0.\n");
+    for (;;) {
+        // sleep the process
+        res = read(fd, &ch, sizeof(char));
+
+        if (res < 0) {
+            print("PRG1: cannot read data from tty0.\n");
+            continue;
+        }
+
+        output[0] = ch;
+	
+        print(output);
     }
 
     res = close(fd);

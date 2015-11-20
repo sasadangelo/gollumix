@@ -8,6 +8,10 @@ static inline unsigned char get_user_byte(const char * addr) {
     return _v;
 }
 
+extern inline void put_user_byte(char val,char *addr) {
+    __asm__ ("movb %0,%%fs:%1"::"q" (val),"m" (*addr));
+}
 
 extern long strncpy_from_user(char *dst, const char *src, long count);
+
 #endif

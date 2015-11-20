@@ -12,6 +12,7 @@
 #include "sched.h"
 #include "kernel.h"
 #include "stddef.h"
+#include "uaccess.h"
 
 #define N_TTYS          N_CONSOLES
 #define IS_VALID_TTY(n) ((n) >= 1 && (n) <= N_TTYS)
@@ -29,17 +30,18 @@
 #define TTY_TABLE(dev) &tty_table[dev];
 
 struct tty_struct tty_table[N_TTYS+1] = {
-    { 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // not used
-    { 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty 1
-    { 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty 2
-    { 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty 3
-    { 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty 4
-    { 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, rs_write  },  // tty 5
+    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // not used
+    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty 1
+    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty 2
+    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty 3
+    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, con_write },  // tty 4
+    { 0, 0, INIT_QUEUE, INIT_QUEUE, INIT_QUEUE, rs_write  },  // tty 5
 };
 
 struct tty_struct *ctty = &tty_table[1];
-
 static struct file_operations tty_fops;
+
+static void copy_to_cooked(struct tty_struct *tty);
 
 //-----------------------------------------------------------------------------
 // PUBLIC functions
@@ -107,11 +109,43 @@ static void tty_close(struct file * filp) {
 
 static int read_chan(struct file *file, char *buf, int nr) {
     struct tty_struct *tty;
+    char *b = buf;
+    int c;
 
     tty = TTY_TABLE(file->dev);
 
-    printk("current process sleeping on channel %d ... \n", file->dev);
-    sleep(&tty->read_q.wait);
+    TTY_READ_FLUSH(tty);
+
+    while (nr > 0) {
+        cli();
+        // check if other data can be put on read_q
+        if (EMPTY(&tty->secondary) && !FULL(&tty->read_q)) {
+            // no data available for processes, wait!!!
+            sleep(&tty->read_q.wait);
+            sti();
+            TTY_READ_FLUSH(tty);
+            continue;
+        }
+
+        // ok, data are available for processes
+        sti();
+        do {
+            // read nr data, if possible.
+            c = getch(&tty->secondary);
+            put_user_byte(c, b++);
+            --nr;
+        } while (nr > 0 && !EMPTY(&tty->secondary));
+
+        wake_up(&tty->read_q.wait);
+    }
+
+    sti();
+    TTY_READ_FLUSH(tty);
+
+    if (b-buf) {
+        return b - buf;
+    }
+
     return 0;
 }
 
@@ -135,3 +169,14 @@ static struct file_operations tty_fops = {
     tty_write,
     tty_close
 };
+
+static void copy_to_cooked(struct tty_struct *tty) {
+    int c;
+
+    while (!EMPTY(&tty->read_q) && !FULL(&tty->secondary)) {
+        c = getch(&tty->read_q);
+        putch(c, &tty->secondary);
+    }
+
+    wake_up(&tty->secondary.wait);
+}
