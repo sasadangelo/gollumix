@@ -12,8 +12,6 @@ I decided to create a very easy operating system that was able to boot from flop
 
 The result can be viewed downloading the source code below.
 
-Create an operating system is not an easy task, it requires lot of effort to figure out how things work. For this reason I decided to build my operating system step by step and document each step in details. For more details see Documentation section below.
-
 ## Features
 
 Check the feature list [here](https://github.com/sasadangelo/gollumix/wiki).
