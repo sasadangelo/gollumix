@@ -24,7 +24,7 @@ The result can be viewed downloading the source code below.
 
 Check the feature list [here](https://github.com/sasadangelo/gollumix/wiki).
 
-## Release
+## Release and Download
 
 The current pre-release is 0.0.61 and you can download it from [Github](https://github.com/sasadangelo/gollumix/releases).
 
