@@ -26,7 +26,7 @@ Create an operating system is not an easy task, it requires lot of effort to fig
 
 ## Contributing
 
-Patches, forks, pull requests, suggestions or harsh flame is welcome! First of all read the [design document on the wiki](https://github.com/sasadangelo/gollumix/wiki/Design) to understand how the app works. I am preparing a TODO list and Contrubuting guidelines that will be available soon.
+Patches, forks, pull requests, suggestions or harsh flame is welcome! First of all read the [design document on the wiki](https://github.com/sasadangelo/gollumix/wiki/Documentation) to understand how the app works. I am preparing a TODO list and Contrubuting guidelines that will be available soon.
 
 ## License
 
